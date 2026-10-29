@@ -452,6 +452,11 @@
   // --- SCREEN SWITCHING ---
   function showLobbyScreen() {
     state.activeScreen = 'lobby';
+    if (state.activeRoom && state.activeRoom.botTimers) {
+      state.activeRoom.botTimers.forEach(clearTimeout);
+      state.activeRoom.botTimers = [];
+    }
+    resetSlapFrenzyUi();
     state.activeRoom = null;
     state.selectedCardId = null;
     document.getElementById('lobbyView').classList.remove('hidden');
@@ -783,6 +788,12 @@
     if (!container) return;
     container.innerHTML = '';
 
+    if (hand && hand.length >= 5) {
+      container.className = 'grid grid-cols-5 gap-1.5';
+    } else {
+      container.className = 'grid grid-cols-4 gap-2';
+    }
+
     if (!hand || hand.length === 0) {
       const isWaiting = state.activeRoom && state.activeRoom.status === 'waiting';
       container.innerHTML = `
@@ -956,7 +967,28 @@
   }
 
   function passSelectedCard() {
-    if (!state.activeRoom || !state.selectedCardId) return;
+    if (!state.activeRoom) return;
+
+    const myPlayer = state.activeRoom.players?.find(p => p.id === state.playerId);
+    if (!state.selectedCardId && myPlayer?.hand && myPlayer.hand.length > 0) {
+      // Auto-select odd card if user didn't manually click a specific card
+      const counts = {};
+      myPlayer.hand.forEach(c => { counts[c.name] = (counts[c.name] || 0) + 1; });
+      let lowestCount = 999;
+      let oddCard = myPlayer.hand[0];
+      for (const card of myPlayer.hand) {
+        if (counts[card.name] < lowestCount) {
+          lowestCount = counts[card.name];
+          oddCard = card;
+        }
+      }
+      state.selectedCardId = oddCard.id;
+    }
+
+    if (!state.selectedCardId) return;
+
+    const cardToPassId = state.selectedCardId;
+    state.selectedCardId = null;
 
     if (state.isPassAndPlay) {
       handlePassAndPlayStep();
@@ -964,12 +996,12 @@
     }
 
     if (state.isSoloBots) {
-      handleSoloHumanPass();
+      handleSoloHumanPass(cardToPassId);
       return;
     }
 
     sendWsMessage('pass_card', {
-      data: { cardId: state.selectedCardId }
+      data: { cardId: cardToPassId }
     });
   }
 
@@ -1501,7 +1533,7 @@
 
   function setPlayerCount(count) {
     state.playerCount = Math.min(Math.max(Number(count) || 6, 4), 8);
-    [4, 6, 8].forEach(n => {
+    [4, 5, 6, 8].forEach(n => {
       const btn = document.getElementById(`countBtn${n}`);
       if (btn) {
         if (n === state.playerCount) {
@@ -1739,7 +1771,7 @@
             }
           }
         }, slapDelay);
-        room.botTimers.push(slapTimer);
+        state.frenzyTimers.push(slapTimer);
       }
     }
 
@@ -1749,15 +1781,17 @@
     scheduleSoloBotTurn();
   }
 
-  function handleSoloHumanPass() {
+  function handleSoloHumanPass(passedCardId) {
     const room = state.activeRoom;
     if (!room || room.status !== 'playing' || state.slapFrenzyActive) return;
 
     const myPlayer = room.players.find(p => p.id === state.playerId);
     if (!myPlayer) return;
 
+    let cardId = passedCardId || state.selectedCardId;
+
     // If no card selected, pick odd card automatically
-    if (!state.selectedCardId && myPlayer.hand.length > 0) {
+    if (!cardId && myPlayer.hand.length > 0) {
       const counts = {};
       myPlayer.hand.forEach(c => { counts[c.name] = (counts[c.name] || 0) + 1; });
       let lowestCount = 999;
@@ -1768,10 +1802,10 @@
           oddCard = card;
         }
       }
-      state.selectedCardId = oddCard.id;
+      cardId = oddCard.id;
     }
 
-    const cardIdx = myPlayer.hand.findIndex(c => c.id === state.selectedCardId);
+    const cardIdx = myPlayer.hand.findIndex(c => c.id === cardId);
     if (cardIdx === -1) return;
 
     const [passed] = myPlayer.hand.splice(cardIdx, 1);
@@ -1806,7 +1840,7 @@
             startSoloSlapFrenzy(receiver, passed);
           }
         }, slapDelay);
-        room.botTimers.push(slapTimer);
+        state.frenzyTimers.push(slapTimer);
       }
     }
 

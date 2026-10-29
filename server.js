@@ -329,6 +329,8 @@ function createRoom(options = {}) {
     startedAt: null,
     endedAt: null,
     subscribers: new Set(),
+    turnTimer: null,
+    slapTimers: [],
     botTimers: []
   };
 
@@ -494,9 +496,15 @@ function triggerSlapFrenzy(room, initiator, winningCard) {
   room.firstSetPlayer = initiator;
   room.winningCard = winningCard;
 
-  // Clear turn timers
-  room.botTimers.forEach(clearTimeout);
-  room.botTimers = [];
+  // Clear turn timer and any prior slap timers
+  if (room.turnTimer) {
+    clearTimeout(room.turnTimer);
+    room.turnTimer = null;
+  }
+  if (room.slapTimers) {
+    room.slapTimers.forEach(clearTimeout);
+    room.slapTimers = [];
+  }
 
   // Initiator is Rank 1 (1st Winner)
   room.slapOrder = [{
@@ -548,7 +556,7 @@ function triggerSlapFrenzy(room, initiator, winningCard) {
         handleSlapPile(room, p.id);
       }, delay);
 
-      room.botTimers.push(timer);
+      room.slapTimers.push(timer);
     }
   });
 
@@ -587,7 +595,7 @@ function handleSlapPile(room, playerId) {
       return { alreadySlapped: true };
     }
 
-    const reactionTimeMs = Math.max(Date.now() - room.slapFrenzyStartedAt, 10);
+    const reactionTimeMs = Math.max(Date.now() - (room.slapFrenzyStartedAt || Date.now()), 10);
     const rank = room.slapOrder.length + 1;
     const entry = {
       playerId: player.id,
@@ -619,23 +627,6 @@ function handleSlapPile(room, playerId) {
   }
 }
 
-function scheduleBotSlap(room, bot, winningCard) {
-  if (room.status !== 'playing' || room.botSlapScheduled) return;
-  room.botSlapScheduled = true;
-  // Bot realizes it has 4-of-a-kind after realistic thinking delay (600ms - 1100ms) and slaps
-  const delay = 600 + Math.random() * 500;
-  const timer = setTimeout(() => {
-    room.botSlapScheduled = false;
-    if (room.status === 'playing') {
-      const stillHasWin = checkWinner(bot.hand);
-      if (stillHasWin) {
-        triggerSlapFrenzy(room, bot, stillHasWin);
-      }
-    }
-  }, delay);
-  room.botTimers.push(timer);
-}
-
 function endRoomGameWithWinnerBoard(room) {
   if (room.status === 'gameover') return;
   console.log(`[GAME] Match ended in room #${room.id}! Calculating final winner board.`);
@@ -643,8 +634,14 @@ function endRoomGameWithWinnerBoard(room) {
   room.status = 'gameover';
   room.endedAt = Date.now();
 
-  room.botTimers.forEach(clearTimeout);
-  room.botTimers = [];
+  if (room.turnTimer) {
+    clearTimeout(room.turnTimer);
+    room.turnTimer = null;
+  }
+  if (room.slapTimers) {
+    room.slapTimers.forEach(clearTimeout);
+    room.slapTimers = [];
+  }
   if (room.slapFrenzyTimer) {
     clearTimeout(room.slapFrenzyTimer);
     room.slapFrenzyTimer = null;
@@ -707,15 +704,18 @@ function passCardInRoom(room, playerId, cardId) {
 
   console.log(`[PASS] ${currentTurnPlayer.name} passed ${passedCard.name} to ${receiver.name}`);
 
-  // Check if passer (by passing odd card) or receiver (by getting 4th card) completed 4-of-a-kind
-  const passerWin = checkWinner(currentTurnPlayer.hand);
+  // Check if receiver (bot) just got 4-of-a-kind: schedule slap with dedicated slapTimer
   const receiverWin = checkWinner(receiver.hand);
-
-  // If a Bot gets 4 of a kind, bot will slap the center pile!
-  if (passerWin && currentTurnPlayer.isBot) {
-    scheduleBotSlap(room, currentTurnPlayer, passerWin);
-  } else if (receiverWin && receiver.isBot) {
-    scheduleBotSlap(room, receiver, receiverWin);
+  if (receiverWin && receiver.isBot) {
+    const slapTimer = setTimeout(() => {
+      if (room.status === 'playing') {
+        const stillWin = checkWinner(receiver.hand);
+        if (stillWin) {
+          triggerSlapFrenzy(room, receiver, stillWin);
+        }
+      }
+    }, 600 + Math.random() * 400);
+    room.slapTimers.push(slapTimer);
   }
 
   room.turn = nextIndex;
@@ -760,41 +760,39 @@ function scheduleTurnTimer(room) {
   const current = room.players[room.turn];
   if (!current) return;
 
-  // Clear existing timers
-  room.botTimers.forEach(clearTimeout);
-  room.botTimers = [];
+  // Clear ONLY the active turn timer (never clear slapTimers!)
+  if (room.turnTimer) {
+    clearTimeout(room.turnTimer);
+    room.turnTimer = null;
+  }
 
   if (current.isBot) {
-    // Bot thinks for 0.8s to 1.3s
-    const delay = 800 + Math.random() * 500;
+    // Bot thinks for 0.75s to 1.25s
+    const delay = 750 + Math.random() * 500;
     console.log(`[BOT] ${current.name} is thinking for ${(delay / 1000).toFixed(1)}s...`);
 
-    const timer = setTimeout(() => {
+    room.turnTimer = setTimeout(() => {
       if (room.status !== 'playing') return;
       if (room.players[room.turn]?.id !== current.id) return;
       if (!current.hand || current.hand.length === 0) return;
 
       const winCard = checkWinner(current.hand);
       if (winCard) {
-        // Bot slaps pile instead of passing away a winning set
-        scheduleBotSlap(room, current, winCard);
+        // Bot slaps the pile on their turn!
+        triggerSlapFrenzy(room, current, winCard);
         return;
       }
 
       passBestOddCardForPlayer(room, current);
     }, delay);
-
-    room.botTimers.push(timer);
   } else {
     // Human turn: 12-second safety auto-pass so match never freezes if user is idle/AFK
-    const afkTimer = setTimeout(() => {
+    room.turnTimer = setTimeout(() => {
       if (room.status !== 'playing') return;
       if (room.players[room.turn]?.id !== current.id) return;
       console.log(`[AUTO-PASS] Human ${current.name} was idle for 12s, auto-passing odd card to keep match flowing`);
       passBestOddCardForPlayer(room, current);
     }, 12000);
-
-    room.botTimers.push(afkTimer);
   }
 }
 
