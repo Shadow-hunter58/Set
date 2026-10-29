@@ -342,7 +342,7 @@ function createRoom(options = {}) {
 function broadcastToRoom(room, event, payloadOrGetter) {
   for (const ws of room.subscribers) {
     try {
-      if (ws.readyState === 1) { // OPEN
+      if (!ws.destroyed && ws.writable) {
         const data = typeof payloadOrGetter === 'function' ? payloadOrGetter(ws.playerId) : payloadOrGetter;
         const msg = JSON.stringify({ event, data, timestamp: Date.now() });
         sendWsFrame(ws, msg);
@@ -859,16 +859,14 @@ function handleWebSocketUpgrade(req, socket, head) {
     .update(key + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')
     .digest('base64');
 
-  const headers = [
-    'HTTP/1.1 101 Switching Protocols',
-    'Upgrade: websocket',
-    'Connection: Upgrade',
-    `Sec-WebSocket-Accept: ${acceptKey}`,
-    '\r\n'
-  ];
+  const response = 
+    'HTTP/1.1 101 Switching Protocols\r\n' +
+    'Upgrade: websocket\r\n' +
+    'Connection: Upgrade\r\n' +
+    `Sec-WebSocket-Accept: ${acceptKey}\r\n\r\n`;
 
-  socket.write(headers.join('\r\n'));
-  socket.readyState = 1;
+  socket.write(response);
+  socket.isWsOpen = true;
 
   let buffer = head && head.length > 0 ? Buffer.from(head) : Buffer.alloc(0);
 
@@ -929,7 +927,7 @@ function handleWebSocketUpgrade(req, socket, head) {
   });
 
   socket.on('close', () => {
-    socket.readyState = 3;
+    socket.isWsOpen = false;
     removeWsFromAllRooms(socket);
   });
 
@@ -939,7 +937,7 @@ function handleWebSocketUpgrade(req, socket, head) {
 }
 
 function sendWsFrame(socket, payload, opcode = 0x01) {
-  if (socket.destroyed || socket.readyState !== 1) return;
+  if (socket.destroyed || !socket.writable) return;
   const data = Buffer.isBuffer(payload) ? payload : Buffer.from(payload, 'utf8');
   let header;
 
