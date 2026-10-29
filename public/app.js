@@ -249,8 +249,8 @@
           try { state.ws.send(raw); } catch (e) {}
         }
 
-        // If we were inside a room, re-join
-        if (state.activeRoom) {
+        // If we were inside an active online multiplayer room, re-join (never for solo bots or pass-and-play)
+        if (state.activeRoom && !state.isSoloBots && !state.isPassAndPlay) {
           sendWsMessage('join_room', { roomId: state.activeRoom.id });
         }
       };
@@ -1552,9 +1552,12 @@
 
   // Quick Play against AI bots (Instant, responsive, smart AI bots)
   function triggerQuickPlay() {
+    AudioEngine.cardSelect();
+    vibrate([40]);
     if (state.ws && state.ws.readyState === WebSocket.OPEN) {
       state.isPassAndPlay = false;
       state.isSoloBots = false;
+      showToast(`Starting ${state.playerCount}P Bot Arena...`, 'info');
       sendWsMessage('quick_play', {
         data: {
           name: state.playerName,
@@ -2039,6 +2042,14 @@
 
     // Polling interval for open rooms feed
     setInterval(fetchRoomsList, 5000);
+
+    // Auto-launch match if requested via URL parameter (?play=1 or ?game=1)
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('play') === '1' || urlParams.get('game') === '1' || urlParams.get('start') === '1') {
+        setTimeout(triggerQuickPlay, 300);
+      }
+    } catch (e) {}
   });
 
   // Expose global methods for onclick handlers
