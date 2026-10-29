@@ -1,1 +1,3 @@
 animal: tiger,lion,hippo,monkey
+superheroes: ironman,batman,spiderman,thor
+gadgets: laptop,smartphone,smartwatch,drone

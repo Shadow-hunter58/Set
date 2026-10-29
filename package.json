@@ -1,0 +1,9 @@
+{
+  "name": "set-card-game",
+  "version": "1.0.0",
+  "description": "SET! 4-of-a-Kind Card Passing Multiplayer Game for Android & Mobile Web",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
