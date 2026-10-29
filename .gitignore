@@ -1,0 +1,21 @@
+# Gradle & Build
+.gradle/
+/build/
+/app/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+
+# IDE & Config
+.idea/
+*.iml
+/local.properties
+local.properties
+.DS_Store
+
+# Python & Temporary
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
