@@ -1,0 +1,287 @@
+/* SET! Midnight Black + Electric Cobalt + Acid Lime Design System */
+:root {
+  --bg-dark: #030712;
+  --surface-lowest: #050914;
+  --surface-low: #0a1128;
+  --surface-container: #101c3d;
+  --surface-high: #172754;
+  --surface-highest: #1f336e;
+  
+  /* Primary Action: Acid Lime */
+  --primary: #ccff00;
+  --primary-neon: #ccff00;
+  --primary-dark: #0f1a00;
+  --lime-glow: rgba(204, 255, 0, 0.45);
+
+  /* Energy Aura: Electric Cobalt Blue */
+  --cobalt: #2979ff;
+  --cobalt-electric: #3d82f6;
+  --cobalt-deep: #1d4ed8;
+  --secondary: #2979ff;
+  --secondary-neon: #2979ff;
+  --cobalt-glow: rgba(41, 121, 255, 0.45);
+
+  /* Accents & Text */
+  --tertiary-neon: #38bdf8;
+  --text-main: #f1f5f9;
+  --text-muted: #8ba1c7;
+  --text-dim: #50658a;
+  
+  --border-glass: rgba(41, 121, 255, 0.2);
+  --border-neon: rgba(204, 255, 0, 0.45);
+  --border-cobalt: rgba(41, 121, 255, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+}
+
+/* App Container */
+.app-container {
+  width: 100%;
+  max-width: 440px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  background-color: var(--surface-lowest);
+  overflow-x: hidden;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.95), 0 0 20px rgba(41, 121, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cyber Ambient Gradients: Electric Cobalt & Acid Lime */
+.cyber-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.blob-cyan {
+  position: absolute;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(41, 121, 255, 0.22) 0%, rgba(29, 78, 216, 0.08) 50%, transparent 70%);
+  filter: blur(70px);
+}
+.blob-purple {
+  position: absolute;
+  top: 35%;
+  right: -90px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(204, 255, 0, 0.14) 0%, transparent 70%);
+  filter: blur(80px);
+}
+.blob-coral {
+  position: absolute;
+  bottom: 12%;
+  left: -90px;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(41, 121, 255, 0.18) 0%, transparent 70%);
+  filter: blur(75px);
+}
+
+/* Glass Panels */
+.glass-panel {
+  background: rgba(16, 28, 61, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+}
+.glass-panel-heavy {
+  background: rgba(10, 17, 40, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(41, 121, 255, 0.35);
+  border-radius: 20px;
+}
+
+/* Glow Utilities */
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(204, 255, 0, 0.45), 0 0 40px rgba(41, 121, 255, 0.2);
+}
+.glow-cyan-sm {
+  box-shadow: 0 0 10px rgba(204, 255, 0, 0.35);
+}
+.glow-purple {
+  box-shadow: 0 0 22px rgba(41, 121, 255, 0.45);
+}
+.glow-coral {
+  box-shadow: 0 0 16px rgba(204, 255, 0, 0.4);
+}
+.text-glow {
+  text-shadow: 0 0 14px rgba(204, 255, 0, 0.75);
+}
+.text-glow-cobalt {
+  text-shadow: 0 0 14px rgba(41, 121, 255, 0.8);
+}
+
+/* Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, #ccff00 0%, #b8f000 100%);
+  color: #030712;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 0 24px rgba(204, 255, 0, 0.45), 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+.btn-primary:active {
+  transform: scale(0.97);
+}
+.btn-secondary {
+  background: rgba(23, 39, 84, 0.85);
+  color: var(--text-main);
+  border: 1px solid rgba(41, 121, 255, 0.3);
+  border-radius: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+.btn-secondary:hover {
+  border-color: var(--primary-neon);
+  color: var(--primary);
+}
+.btn-secondary:active {
+  transform: scale(0.96);
+}
+
+/* Animations */
+@keyframes pulse-ring {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+.anim-pulse {
+  animation: pulse-ring 2.5s infinite ease-in-out;
+}
+
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.anim-spin-slow {
+  animation: rotate-slow 18s linear infinite;
+}
+
+@keyframes card-pass-anim {
+  0% { transform: translate(-60px, -40px) scale(0.6) rotate(-20deg); opacity: 0; }
+  30% { opacity: 1; }
+  80% { transform: translate(30px, 20px) scale(0.9) rotate(5deg); opacity: 0.9; }
+  100% { transform: translate(60px, 40px) scale(1) rotate(0deg); opacity: 0; }
+}
+.anim-card-flight {
+  animation: card-pass-anim 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+/* Playing Card Component */
+.game-card {
+  height: 124px;
+  border-radius: 14px;
+  background: rgba(20, 33, 68, 0.9);
+  border: 1px solid rgba(41, 121, 255, 0.25);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 6px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, box-shadow 0.2s;
+  user-select: none;
+}
+.game-card:hover {
+  transform: translateY(-4px);
+}
+.game-card.selected-pass {
+  transform: translateY(-12px);
+  border: 2px solid #ccff00;
+  box-shadow: 0 0 24px rgba(204, 255, 0, 0.65), 0 0 12px rgba(41, 121, 255, 0.4);
+  background: linear-gradient(180deg, #1f336e 0%, #0a1128 100%);
+}
+.game-card.is-matching {
+  border-color: rgba(41, 121, 255, 0.6);
+}
+.game-card-icon {
+  font-size: 32px;
+  filter: drop-shadow(0 0 8px rgba(41, 121, 255, 0.3));
+  margin: auto 0;
+}
+.game-card.selected-pass .game-card-icon {
+  animation: card-bounce 0.8s infinite ease-in-out;
+}
+@keyframes card-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+
+/* Floating Emoji Reactions */
+.reaction-floating {
+  position: absolute;
+  font-size: 28px;
+  pointer-events: none;
+  animation: float-up 1.8s forwards cubic-bezier(0.1, 0.8, 0.3, 1);
+  z-index: 100;
+}
+@keyframes float-up {
+  0% { transform: translateY(0) scale(0.5); opacity: 0; }
+  20% { opacity: 1; transform: translateY(-20px) scale(1.3); }
+  80% { opacity: 0.9; transform: translateY(-80px) scale(1); }
+  100% { opacity: 0; transform: translateY(-120px) scale(0.8); }
+}
+
+/* Confetti particles for victory */
+.confetti-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  animation: confetti-fall 2.5s forwards linear;
+}
+@keyframes confetti-fall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(500px) rotate(720deg); opacity: 0; }
+}
+
+/* Scrollbars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
