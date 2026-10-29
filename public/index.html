@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="theme-color" content="#0b0e17"/>
+  <meta name="description" content="SET! - Fast-Paced 4-of-a-Kind Card Passing Multiplayer Game for Android & Mobile Web"/>
+  <title>SET! - 4-of-a-Kind Card Passing Battle</title>
+
+  <!-- Force Purge Stale Service Worker Caches -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        for (const reg of regs) reg.unregister();
+      });
+    }
+    if ('caches' in window) {
+      caches.keys().then(keys => keys.forEach(key => caches.delete(key)));
+    }
+  </script>
+
+  <!-- Custom Stylesheet with Cache Busting -->
+  <link rel="stylesheet" href="style.css?v=3.0"/>
+
+  <!-- Google Fonts: Outfit & Plus Jakarta Sans + Material Symbols -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind CSS CDN for fluid utility styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'midnight': '#030712',
+            'surface-lowest': '#050914',
+            'surface-low': '#0a1128',
+            'surface-container': '#101c3d',
+            'surface-high': '#172754',
+            'surface-highest': '#1f336e',
+            'cobalt': '#2979ff',
+            'cobalt-electric': '#3d82f6',
+            'cobalt-deep': '#1d4ed8',
+            'primary-neon': '#ccff00',
+            'primary-dark': '#0f1a00',
+            'secondary-neon': '#2979ff',
+            'tertiary-neon': '#38bdf8',
+            'on-surface': '#f1f5f9',
+            'muted': '#8ba1c7'
+          },
+          fontFamily: {
+            outfit: ['Outfit', 'sans-serif'],
+            body: ['Plus Jakarta Sans', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Custom Game Styles -->
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="bg-surface-lowest text-on-surface antialiased overflow-x-hidden selection:bg-primary-neon selection:text-surface-lowest">
+
+  <!-- Ambient Stage Gradient Blobs -->
+  <div class="cyber-bg">
+    <div class="blob-cyan"></div>
+    <div class="blob-purple"></div>
+    <div class="blob-coral"></div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="appToast" style="display: none;"></div>
+
+  <!-- Confetti Container for Victory Celebration -->
+  <div id="confettiContainer" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
+
+  <!-- Floating Reactions Container -->
+  <div id="floatingReactionsContainer" class="fixed inset-0 pointer-events-none z-40 overflow-hidden"></div>
+
+  <!-- Mobile App Frame -->
+  <div class="app-container">
+
+    <!-- SHARED TOP APP BAR -->
+    <header class="sticky top-0 z-40 flex justify-between items-center px-4 h-16 w-full bg-surface-low/85 backdrop-blur-md border-b border-white/10 shadow-lg">
+      <!-- Leading Brand Logo -->
+      <div class="flex items-center gap-1.5 cursor-pointer" onclick="window.setApp.returnToLobby()">
+        <span class="font-outfit font-black text-2xl tracking-wider text-primary-neon text-glow select-none">
+          SET!
+        </span>
+        <div class="px-1.5 py-0.5 rounded-full bg-secondary-neon/20 border border-secondary-neon/40 flex items-center">
+          <span class="text-[9px] font-bold text-secondary-neon uppercase tracking-wider">4-PASS</span>
+        </div>
+      </div>
+
+      <!-- Right Multi-Action Controls -->
+      <div class="flex items-center space-x-1">
+        <!-- Sound Toggle -->
+        <button class="w-8 h-8 rounded-full flex items-center justify-center text-muted hover:text-primary-neon hover:bg-surface-high transition-colors active:scale-90 cursor-pointer" 
+                onclick="window.setApp.toggleSound()" title="Sound On/Off">
+          <span class="material-symbols-outlined text-[20px]" id="soundIcon">volume_up</span>
+        </button>
+        <!-- Rules Modal Trigger -->
+        <button class="w-8 h-8 rounded-full flex items-center justify-center text-muted hover:text-primary-neon hover:bg-surface-high transition-colors active:scale-90 cursor-pointer"
+                onclick="document.getElementById('rulesModal').classList.remove('hidden')" title="Game Rules">
+          <span class="material-symbols-outlined text-[20px]">help</span>
+        </button>
+        <!-- Ping Badge -->
+        <div id="pingIndicator" class="px-2 py-0.5 rounded-full bg-surface-high/80 border border-white/10 flex items-center gap-1 text-[11px] font-mono text-muted">
+          <span class="material-symbols-outlined text-[13px] text-primary-neon animate-pulse">bolt</span>
+          <span>Online</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 1: LOBBY VIEW                       -->
+    <!-- ========================================== -->
+    <main id="lobbyView" class="relative z-10 w-full px-4 pt-3 pb-24 flex flex-col gap-4">
+
+      <!-- Live Telemetry Banner -->
+      <section class="flex items-center justify-between px-3.5 py-1.5 rounded-full glass-panel">
+        <div class="flex items-center space-x-2">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-neon opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary-neon"></span>
+          </span>
+          <p class="text-xs font-bold text-on-surface tracking-wide">
+            Multiplayer Arena <span class="text-muted font-normal">• 2 to 8 Players</span>
+          </p>
+        </div>
+        <div class="flex items-center gap-1 text-primary-neon text-[11px] font-mono font-bold">
+          <span>Wi-Fi Enabled</span>
+        </div>
+      </section>
+
+      <!-- HERO 4-OF-A-KIND OBJECTIVE VISUALIZER -->
+      <section class="relative w-full rounded-2xl p-4 overflow-hidden glass-panel border border-white/10 flex flex-col items-center justify-center text-center">
+        <!-- Floating Visual Cards Fan -->
+        <div class="relative w-full h-24 flex items-center justify-center select-none">
+          <div class="absolute w-14 h-20 -rotate-12 -translate-x-12 bg-surface-high rounded-xl p-1.5 border border-primary-neon/30 shadow-lg flex flex-col justify-between items-center">
+            <span class="text-[10px] font-bold text-primary-neon self-start">🍓</span>
+            <span class="text-xl">🍓</span>
+            <span class="text-[8px] font-mono text-muted">SET</span>
+          </div>
+          <div class="absolute w-14 h-20 -rotate-3 -translate-x-4 bg-surface-high rounded-xl p-1.5 border border-primary-neon/50 shadow-xl flex flex-col justify-between items-center z-10">
+            <span class="text-[10px] font-bold text-primary-neon self-start">🍓</span>
+            <span class="text-xl">🍓</span>
+            <span class="text-[8px] font-mono text-muted">SET</span>
+          </div>
+          <div class="absolute w-14 h-20 rotate-6 translate-x-4 bg-surface-high rounded-xl p-1.5 border border-primary-neon/70 shadow-xl flex flex-col justify-between items-center z-20 glow-cyan-sm">
+            <span class="text-[10px] font-bold text-primary-neon self-start">🍓</span>
+            <span class="text-xl">🍓</span>
+            <span class="text-[8px] font-mono text-muted">SET</span>
+          </div>
+          <div class="absolute w-14 h-20 rotate-16 translate-x-12 bg-surface-high rounded-xl p-1.5 border-2 border-primary-neon shadow-2xl flex flex-col justify-between items-center z-30 glow-cyan">
+            <span class="text-[10px] font-bold text-primary-neon self-start">🍓</span>
+            <span class="text-xl animate-bounce">🍓</span>
+            <div class="px-1 rounded bg-primary-neon text-surface-lowest text-[7px] font-black uppercase">
+              WIN!
+            </div>
+          </div>
+        </div>
+        <!-- Tagline -->
+        <div class="mt-2 text-center">
+          <h2 class="font-outfit font-bold text-base text-on-surface tracking-tight">
+            Pass fast. Collect 4-of-a-Kind.
+          </h2>
+          <p class="text-xs text-muted">Slap the center deck before your rivals do!</p>
+        </div>
+      </section>
+
+      <!-- PLAYER PROFILE & AVATAR PICKER -->
+      <section class="glass-panel p-4 relative border border-white/10">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-bold text-on-surface tracking-wider uppercase">BATTLE IDENTITY</span>
+            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-secondary-neon/20 text-secondary-neon border border-secondary-neon/40">
+              READY
+            </span>
+          </div>
+          <div id="playerStreakBadge" class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-lowest border border-white/10 text-[10px] font-bold text-primary-neon transition-all">
+            <span>🔥</span>
+            <span id="streakCountText">Streak: 0</span>
+          </div>
+        </div>
+
+        <!-- Horizontal Avatar Picker -->
+        <div class="mb-3">
+          <p class="text-[10px] font-bold text-muted uppercase tracking-wider mb-1.5">Choose Avatar</p>
+          <div class="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar py-1">
+            <!-- Cyber Fox -->
+            <button class="avatar-option active-avatar flex flex-col items-center flex-shrink-0 cursor-pointer transition-transform active:scale-95" data-avatar="fox">
+              <div class="w-12 h-12 p-0.5 rounded-2xl bg-gradient-to-tr from-primary-neon via-surface-high to-secondary-neon ring-2 ring-primary-neon shadow-lg flex items-center justify-center text-2xl">
+                🦊
+              </div>
+              <span class="text-[10px] font-bold text-primary-neon mt-1">Fox</span>
+            </button>
+            <!-- Neon Cat -->
+            <button class="avatar-option opacity-75 hover:opacity-100 flex flex-col items-center flex-shrink-0 cursor-pointer transition-transform active:scale-95" data-avatar="cat">
+              <div class="w-12 h-12 p-0.5 rounded-2xl bg-surface-high border border-white/20 flex items-center justify-center text-2xl">
+                🐱
+              </div>
+              <span class="text-[10px] font-bold text-muted mt-1">Cat</span>
+            </button>
+            <!-- Pixel Bot -->
+            <button class="avatar-option opacity-75 hover:opacity-100 flex flex-col items-center flex-shrink-0 cursor-pointer transition-transform active:scale-95" data-avatar="bot">
+              <div class="w-12 h-12 p-0.5 rounded-2xl bg-surface-high border border-white/20 flex items-center justify-center text-2xl">
+                🤖
+              </div>
+              <span class="text-[10px] font-bold text-muted mt-1">Bot</span>
+            </button>
+            <!-- Astro Kid -->
+            <button class="avatar-option opacity-75 hover:opacity-100 flex flex-col items-center flex-shrink-0 cursor-pointer transition-transform active:scale-95" data-avatar="astro">
+              <div class="w-12 h-12 p-0.5 rounded-2xl bg-surface-high border border-white/20 flex items-center justify-center text-2xl">
+                🧑‍🚀
+              </div>
+              <span class="text-[10px] font-bold text-muted mt-1">Astro</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Nickname Input -->
+        <div class="relative flex items-center">
+          <div class="absolute left-3 flex items-center pointer-events-none text-primary-neon">
+            <span class="material-symbols-outlined text-base">badge</span>
+          </div>
+          <input id="nicknameInput" type="text" maxlength="16" placeholder="Your Player Nickname" 
+                 class="w-full bg-surface-lowest border border-white/20 focus:border-primary-neon rounded-xl pl-9 pr-20 py-2 text-xs font-bold text-on-surface focus:outline-none"/>
+          <button class="absolute right-1.5 px-2 py-1 rounded-lg bg-surface-high text-primary-neon text-[10px] font-bold flex items-center gap-1 active:scale-90 transition-transform cursor-pointer"
+                  onclick="window.setApp.randomizeName()">
+            <span>🎲</span>
+            <span>Roll</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- PRIMARY ACTION HUB -->
+      <section class="flex flex-col gap-2.5">
+        <!-- HERO QUICK PLAY BUTTON -->
+        <button id="quickPlayBtn" class="group w-full h-16 rounded-2xl p-0.5 btn-primary glow-cyan transition-all active:scale-[0.98] cursor-pointer"
+                onclick="window.setApp.triggerQuickPlay()">
+          <div class="w-full h-full flex items-center justify-between px-5">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-xl bg-surface-lowest flex items-center justify-center text-primary-neon shadow">
+                <span class="material-symbols-outlined text-2xl font-black">bolt</span>
+              </div>
+              <div class="text-left">
+                <span class="block font-outfit font-black text-lg text-surface-lowest leading-tight">PLAY VS 3 BOTS</span>
+                <span class="text-[10px] text-primary-dark font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-xs">smart_toy</span> Solo Practice Match • Real AI
+                </span>
+              </div>
+            </div>
+            <div class="w-8 h-8 rounded-full bg-surface-lowest/15 flex items-center justify-center text-surface-lowest group-hover:translate-x-1 transition-transform">
+              <span class="material-symbols-outlined text-xl font-bold">arrow_forward</span>
+            </div>
+          </div>
+        </button>
+
+        <!-- DUAL MULTIPLAYER ACTION ROW -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <!-- Host Room (With Phone QR Code) -->
+          <button class="rounded-2xl p-3.5 bg-surface-high/60 border border-secondary-neon/50 hover:border-secondary-neon transition-all text-left flex flex-col justify-between h-28 glow-purple active:scale-95 cursor-pointer"
+                  onclick="window.setApp.openHostModal()">
+            <div class="flex items-start justify-between w-full">
+              <div class="w-8 h-8 rounded-xl bg-secondary-neon/20 border border-secondary-neon/40 flex items-center justify-center text-secondary-neon">
+                <span class="material-symbols-outlined text-lg">add</span>
+              </div>
+              <span class="text-[9px] px-2 py-0.5 rounded-full bg-secondary-neon/20 text-secondary-neon font-bold">
+                📱 QR / Wi-Fi
+              </span>
+            </div>
+            <div>
+              <h3 class="font-outfit font-bold text-sm text-on-surface">Host Room</h3>
+              <p class="text-[10px] text-muted">Play with friends on phone</p>
+            </div>
+          </button>
+
+          <!-- Join by Code -->
+          <button class="rounded-2xl p-3.5 bg-surface-high/60 border border-white/20 hover:border-primary-neon transition-all text-left flex flex-col justify-between h-28 glow-cyan-sm active:scale-95 cursor-pointer"
+                  onclick="window.setApp.openJoinModal()">
+            <div class="flex items-start justify-between w-full">
+              <div class="w-8 h-8 rounded-xl bg-surface-highest flex items-center justify-center text-primary-neon border border-primary-neon/30">
+                <span class="material-symbols-outlined text-lg">pin</span>
+              </div>
+              <span class="text-[9px] px-2 py-0.5 rounded-full bg-surface-highest text-primary-neon font-bold">
+                CODE #
+              </span>
+            </div>
+            <div>
+              <h3 class="font-outfit font-bold text-sm text-on-surface">Join Code</h3>
+              <p class="text-[10px] text-muted">Enter 4-digit PIN</p>
+            </div>
+          </button>
+        </div>
+
+        <!-- Pass & Play Offline Action -->
+        <button class="w-full py-2.5 px-4 rounded-xl bg-surface-high border border-white/10 hover:border-primary-neon text-xs font-bold text-on-surface flex items-center justify-between active:scale-98 transition-all cursor-pointer"
+                onclick="window.setApp.startPassAndPlay()">
+          <div class="flex items-center gap-2">
+            <span class="text-base">🔄</span>
+            <span>Pass & Play (Offline on 1 Phone)</span>
+          </div>
+          <span class="text-[10px] text-primary-neon">Local Mode ➔</span>
+        </button>
+      </section>
+
+      <!-- DECK THEME PICKER -->
+      <section class="flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="font-outfit font-bold text-sm text-on-surface uppercase tracking-wide">CHOOSE DECK THEME</h2>
+            <p class="text-[10px] text-muted">4 Matching Cards per Set</p>
+          </div>
+          <span class="text-[10px] text-primary-neon font-mono font-bold">Original Rules</span>
+        </div>
+
+        <!-- Deck pills horizontal list -->
+        <div id="categoriesContainer" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Mini Deck Preview Box -->
+        <div id="deckPreviewBox" class="glass-panel p-2.5 flex items-center justify-between border border-white/10">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 2: IN-GAME MATCH VIEW               -->
+    <!-- ========================================== -->
+    <main id="gameView" class="hidden relative z-10 w-full min-h-screen flex flex-col justify-between pb-3">
+
+      <!-- TOP GAMEPLAY HUD -->
+      <header class="px-3 pt-3 pb-2 bg-surface-low/90 backdrop-blur-md border-b border-white/10 flex items-center justify-between gap-2 shadow-md">
+        <!-- Room Code & Round -->
+        <div class="flex flex-col gap-0.5 items-start">
+          <div class="flex items-center gap-1.5 bg-surface-high px-2 py-0.5 rounded-full border border-white/10">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary-neon animate-pulse" style="background:#00F5D4;"></span>
+            <span id="gameRoomCode" class="text-[11px] font-mono text-primary-neon font-bold">#SET-ARENA</span>
+          </div>
+          <div class="flex items-center gap-1.5 text-[10px] text-muted pl-0.5">
+            <span id="gameRoundBadge" class="text-secondary-neon font-bold">RD 1</span>
+            <span>•</span>
+            <span class="text-primary-neon font-bold">Active</span>
+          </div>
+        </div>
+
+        <!-- Center Turn Indicator Pill -->
+        <div id="turnActionPill" class="px-3 py-1 rounded-full flex items-center gap-1.5">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="flex items-center gap-1.5">
+          <!-- Bot Pilot Toggle -->
+          <button id="autoPilotBtn" class="px-2.5 py-1 rounded-full border border-primary-neon/40 text-[10px] font-bold flex items-center gap-1 bg-surface-high hover:border-primary-neon transition-all cursor-pointer" onclick="window.setApp.toggleAutoPilot()" title="Toggle Bot Auto-Pilot">
+            <span>🤖</span>
+            <span id="autoPilotText" class="text-primary-neon font-mono">Pilot: OFF</span>
+          </button>
+          <!-- Right: Leave Button -->
+          <button class="w-8 h-8 rounded-full bg-surface-high border border-white/10 flex items-center justify-center text-muted hover:text-error transition-all active:scale-90 cursor-pointer"
+                  onclick="window.setApp.returnToLobby()" title="Leave Match">
+            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Host Controls (if game is waiting in lobby) -->
+      <div id="hostWaitingControls" class="px-3 pt-2 hidden"></div>
+
+      <!-- Live Action Banner -->
+      <div class="px-3 pt-2">
+        <div id="liveActionTicker" class="w-full max-w-sm mx-auto py-1 px-3 rounded-full bg-surface-high/80 border border-white/10 flex items-center justify-center gap-1.5 text-[11px] font-medium text-center shadow">
+          <span class="w-1.5 h-1.5 rounded-full bg-primary-neon animate-ping"></span>
+          <span id="liveActionTickerText" class="truncate font-semibold text-primary-neon">🎮 Match starting...</span>
+        </div>
+      </div>
+
+      <!-- RADIAL TABLE ARENA -->
+      <section class="relative flex-1 flex flex-col items-center justify-center px-4 py-2 select-none min-h-[280px]">
+        <!-- Table Circles -->
+        <div class="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center">
+          <!-- Outer Neon Orbit -->
+          <div class="absolute inset-0 rounded-full border border-primary-neon/20 shadow-[0_0_24px_rgba(0,245,212,0.1)]"></div>
+          <div class="absolute inset-2 rounded-full border border-dashed border-white/15 anim-spin-slow"></div>
+          <div class="absolute inset-6 rounded-full bg-surface-low/50 backdrop-blur-sm border border-white/10"></div>
+
+          <!-- Direction Badge -->
+          <div id="directionBadge" class="absolute -top-3 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-surface-high border border-primary-neon/30 flex items-center gap-1 shadow z-20">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Opponent Player Seats (Circular Placement) -->
+          <div id="opponentsContainer" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <!-- Seats injected by JS -->
+          </div>
+
+          <!-- Central Holographic SET! Slap Pile -->
+          <div class="relative w-28 h-28 flex items-center justify-center z-30">
+            <button id="centerSlapPileBtn" 
+                    class="relative w-24 h-24 rounded-full bg-surface-high/90 border-2 border-white/20 hover:border-primary-neon transition-all flex flex-col items-center justify-center shadow-2xl active:scale-90 cursor-pointer"
+                    onclick="window.setApp.slapCenterPile()">
+              <span class="material-symbols-outlined text-2xl text-primary-neon">pan_tool</span>
+              <span class="font-outfit font-black text-sm text-on-surface tracking-widest mt-0.5">SET!</span>
+              <span class="text-[8px] font-bold text-muted uppercase">SLAP PILE</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SET! MATCH PROGRESS TRACKER -->
+      <section class="px-3 pb-1">
+        <div id="matchProgressContainer" class="glass-panel p-2.5 border border-white/10">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- ACTIVE PLAYER'S HAND (4 CARDS) -->
+      <section class="px-3 pb-2 flex flex-col gap-2">
+        <div class="flex items-center justify-between px-1">
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs font-bold text-on-surface tracking-wider">YOUR HAND</span>
+            <span class="text-[10px] text-muted">(4 CARDS)</span>
+          </div>
+          <span class="text-[10px] text-primary-neon flex items-center gap-1 animate-pulse">
+            <span class="material-symbols-outlined text-xs">touch_app</span> Tap card to select
+          </span>
+        </div>
+
+        <!-- 4 Card Slots -->
+        <div id="playerHandGrid" class="grid grid-cols-4 gap-2">
+          <!-- Cards injected by JS -->
+        </div>
+
+        <!-- Pass Action Button -->
+        <button id="passCardButton" class="w-full py-3 btn-primary text-xs font-extrabold rounded-xl glow-cyan cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">send</span>
+          <span>PASS SELECTED CARD</span>
+        </button>
+      </section>
+
+      <!-- IN-GAME SOCIAL & EMOJI REACTION DOCK -->
+      <footer class="px-3 py-1.5 bg-surface-lowest/90 backdrop-blur-md flex items-center justify-between border-t border-white/10">
+        <!-- Reaction Emoji Bar -->
+        <div class="flex items-center gap-2 bg-surface-high px-2 py-1 rounded-full border border-white/10">
+          <button class="text-base hover:scale-125 transition-transform active:scale-90 cursor-pointer" onclick="window.setApp.sendReaction('🔥')">🔥</button>
+          <button class="text-base hover:scale-125 transition-transform active:scale-90 cursor-pointer" onclick="window.setApp.sendReaction('😱')">😱</button>
+          <button class="text-base hover:scale-125 transition-transform active:scale-90 cursor-pointer" onclick="window.setApp.sendReaction('💨')">💨</button>
+          <button class="text-base hover:scale-125 transition-transform active:scale-90 cursor-pointer" onclick="window.setApp.sendReaction('👏')">👏</button>
+          <button class="text-base hover:scale-125 transition-transform active:scale-90 cursor-pointer" onclick="window.setApp.sendReaction('🎯')">🎯</button>
+        </div>
+        <!-- Quick Chat GG! -->
+        <button class="bg-surface-high px-3 py-1 rounded-full border border-white/10 text-on-surface flex items-center gap-1 text-xs font-bold active:scale-90 cursor-pointer"
+                onclick="window.setApp.sendReaction('GG! 👏')">
+          <span class="material-symbols-outlined text-sm text-secondary-neon">chat_bubble</span>
+          <span>GG!</span>
+        </button>
+      </footer>
+
+    </main>
+
+    <!-- SHARED BOTTOM NAVIGATION (Lobby screen) -->
+    <nav id="bottomNav" class="fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center px-4 py-2 max-w-[440px] mx-auto bg-surface-lowest/90 backdrop-blur-lg border-t border-white/10">
+      <button class="flex flex-col items-center py-1 px-4 rounded-full bg-surface-high text-primary-neon glow-cyan-sm" onclick="window.setApp.returnToLobby()">
+        <span class="material-symbols-outlined text-xl">sports_esports</span>
+        <span class="text-[10px] font-bold mt-0.5">Lobby</span>
+      </button>
+      <button class="flex flex-col items-center py-1 px-4 text-muted hover:text-primary-neon transition-colors" onclick="window.setApp.openCustomDeckModal()">
+        <span class="material-symbols-outlined text-xl">style</span>
+        <span class="text-[10px] font-bold mt-0.5">Decks</span>
+      </button>
+      <button class="flex flex-col items-center py-1 px-4 text-muted hover:text-primary-neon transition-colors" onclick="window.setApp.openHostModal()">
+        <span class="material-symbols-outlined text-xl">qr_code_scanner</span>
+        <span class="text-[10px] font-bold mt-0.5">QR Connect</span>
+      </button>
+    </nav>
+
+  </div> <!-- End App Container -->
+
+  <!-- ========================================== -->
+  <!-- MODALS                                     -->
+  <!-- ========================================== -->
+
+  <!-- 1. HOST ROOM MODAL (Includes QR Code for Phones!) -->
+  <div id="hostModal" class="app-modal fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="glass-panel-heavy w-full max-w-sm p-5 flex flex-col items-center text-center shadow-2xl relative">
+      <button class="absolute top-3 right-3 text-muted hover:text-white cursor-pointer" onclick="window.setApp.closeHostModal()">
+        <span class="material-symbols-outlined text-xl">close</span>
+      </button>
+
+      <div class="w-12 h-12 rounded-full bg-surface-high border border-primary-neon/40 flex items-center justify-center text-primary-neon mb-2">
+        <span class="material-symbols-outlined text-2xl">sensors</span>
+      </div>
+
+      <h3 class="font-outfit font-bold text-lg text-on-surface">Host Phone Multiplayer</h3>
+      <p class="text-xs text-muted mb-3">Friends on same Wi-Fi scan this QR code to join!</p>
+
+      <!-- Live QR Code -->
+      <div class="w-44 h-44 bg-surface-lowest p-2 rounded-2xl border-2 border-primary-neon shadow-lg glow-cyan-sm mb-3 flex items-center justify-center">
+        <img id="qrCodeImage" src="/api/qr" alt="QR Code" class="w-full h-full object-contain rounded-xl"/>
+      </div>
+
+      <div class="text-[11px] font-mono text-muted mb-3">
+        URL: <span id="serverIpDisplay" class="text-primary-neon font-bold">http://localhost:3000</span>
+      </div>
+
+      <!-- Room Name Input -->
+      <input id="hostRoomNameInput" type="text" placeholder="Room Name (e.g. Vishesh's Arena)" value="Cyber Arena"
+             class="w-full bg-surface-high border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-on-surface focus:outline-none mb-2"/>
+
+      <!-- Max Players -->
+      <div class="w-full flex items-center justify-between text-xs text-muted mb-4 px-1">
+        <span>Max Players:</span>
+        <select id="hostMaxPlayersSelect" class="bg-surface-high border border-white/20 rounded-lg px-2 py-1 text-xs font-bold text-primary-neon">
+          <option value="2">2 Players</option>
+          <option value="3">3 Players</option>
+          <option value="4" selected>4 Players</option>
+          <option value="6">6 Players</option>
+          <option value="8">8 Players</option>
+        </select>
+      </div>
+
+      <button class="w-full py-3 btn-primary text-xs font-bold rounded-xl glow-cyan cursor-pointer" onclick="window.setApp.hostNewRoom()">
+        🚀 CREATE & OPEN ROOM
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. JOIN ROOM PIN MODAL -->
+  <div id="joinModal" class="app-modal fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="glass-panel-heavy w-full max-w-xs p-5 flex flex-col items-center text-center shadow-2xl relative">
+      <button class="absolute top-3 right-3 text-muted hover:text-white cursor-pointer" onclick="window.setApp.closeJoinModal()">
+        <span class="material-symbols-outlined text-xl">close</span>
+      </button>
+
+      <div class="w-12 h-12 rounded-full bg-surface-high border border-primary-neon/40 flex items-center justify-center text-primary-neon mb-2">
+        <span class="material-symbols-outlined text-2xl">pin</span>
+      </div>
+
+      <h3 class="font-outfit font-bold text-lg text-on-surface">Enter Room PIN</h3>
+      <p class="text-xs text-muted mb-4">Enter 4-digit code shown by the host</p>
+
+      <!-- 4 PIN Inputs -->
+      <div class="flex items-center justify-center gap-2 mb-5">
+        <input class="pin-box w-11 h-12 bg-surface-lowest border-2 border-primary-neon/50 focus:border-primary-neon rounded-lg text-center text-2xl font-bold text-primary-neon outline-none" maxlength="1" type="number"/>
+        <input class="pin-box w-11 h-12 bg-surface-lowest border-2 border-primary-neon/50 focus:border-primary-neon rounded-lg text-center text-2xl font-bold text-primary-neon outline-none" maxlength="1" type="number"/>
+        <input class="pin-box w-11 h-12 bg-surface-lowest border-2 border-primary-neon/50 focus:border-primary-neon rounded-lg text-center text-2xl font-bold text-primary-neon outline-none" maxlength="1" type="number"/>
+        <input class="pin-box w-11 h-12 bg-surface-lowest border-2 border-primary-neon/50 focus:border-primary-neon rounded-lg text-center text-2xl font-bold text-primary-neon outline-none" maxlength="1" type="number"/>
+      </div>
+
+      <button class="w-full py-3 btn-primary text-xs font-bold rounded-xl glow-cyan cursor-pointer" onclick="window.setApp.confirmJoinByCode()">
+        ENTER ROOM
+      </button>
+    </div>
+  </div>
+
+  <!-- 3. CUSTOM DECK CREATOR MODAL -->
+  <div id="customDeckModal" class="app-modal fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="glass-panel-heavy w-full max-w-sm p-5 flex flex-col items-center text-center shadow-2xl relative">
+      <button class="absolute top-3 right-3 text-muted hover:text-white cursor-pointer" onclick="window.setApp.closeCustomDeckModal()">
+        <span class="material-symbols-outlined text-xl">close</span>
+      </button>
+
+      <div class="w-12 h-12 rounded-full bg-surface-high border border-secondary-neon/40 flex items-center justify-center text-secondary-neon mb-2">
+        <span class="material-symbols-outlined text-2xl">style</span>
+      </div>
+
+      <h3 class="font-outfit font-bold text-lg text-on-surface">Custom Deck Workshop</h3>
+      <p class="text-xs text-muted mb-4">Create your own categories with items (4 of each dealt)!</p>
+
+      <div class="w-full text-left mb-3">
+        <label class="text-[10px] font-bold text-muted uppercase">Deck Category Name</label>
+        <input id="customDeckNameInput" type="text" placeholder="e.g. Cricket Legends, Anime, Marvel" 
+               class="w-full bg-surface-high border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-on-surface focus:outline-none mt-1"/>
+      </div>
+
+      <div class="w-full text-left mb-4">
+        <label class="text-[10px] font-bold text-muted uppercase">Items (Comma separated, 4+ items)</label>
+        <textarea id="customDeckItemsInput" rows="3" placeholder="e.g. Dhoni, Kohli, Rohit, Sachin, Bumrah"
+                  class="w-full bg-surface-high border border-white/20 rounded-xl p-2.5 text-xs text-on-surface focus:outline-none mt-1"></textarea>
+      </div>
+
+      <button class="w-full py-3 btn-primary text-xs font-bold rounded-xl glow-cyan cursor-pointer" onclick="window.setApp.submitCustomDeck()">
+        ✨ SAVE & USE DECK
+      </button>
+    </div>
+  </div>
+
+  <!-- 4. RULES MODAL -->
+  <div id="rulesModal" class="app-modal fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="glass-panel-heavy w-full max-w-sm p-5 flex flex-col items-center text-left shadow-2xl relative max-h-[85vh] overflow-y-auto">
+      <button class="absolute top-3 right-3 text-muted hover:text-white cursor-pointer" onclick="document.getElementById('rulesModal').classList.add('hidden')">
+        <span class="material-symbols-outlined text-xl">close</span>
+      </button>
+
+      <h3 class="font-outfit font-bold text-lg text-primary-neon text-glow mb-2">How to Play SET!</h3>
+      
+      <div class="space-y-3 text-xs text-on-surface">
+        <div class="p-2.5 rounded-xl bg-surface-high border border-white/10">
+          <p class="font-bold text-primary-neon mb-1">🎯 1. The Goal</p>
+          <p class="text-muted">Collect <strong>4 cards of the same item</strong> (4x Strawberries, 4x Teslas, 4x Lions). The first player to collect 4-of-a-kind and slap the center pile wins!</p>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-surface-high border border-white/10">
+          <p class="font-bold text-primary-neon mb-1">🔄 2. Passing Cards</p>
+          <p class="text-muted">Each player starts with 4 random cards. On your turn, pick 1 card to pass clockwise to the next player. Keep cards that match!</p>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-surface-high border border-white/10">
+          <p class="font-bold text-primary-neon mb-1">📱 3. Phone Multiplayer</p>
+          <p class="text-muted">Host a room on one device, show the QR code. All your friends scan the QR with their phones to join the same table!</p>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-surface-high border border-white/10">
+          <p class="font-bold text-primary-neon mb-1">⚡ 4. Winning SET!</p>
+          <p class="text-muted">As soon as you hold 4 matching cards, SLAP the glowing center pile to claim your victory!</p>
+        </div>
+      </div>
+
+      <button class="w-full py-2.5 btn-primary text-xs font-bold rounded-xl mt-4 cursor-pointer" onclick="document.getElementById('rulesModal').classList.add('hidden')">
+        GOT IT, LET'S PLAY!
+      </button>
+    </div>
+  </div>
+
+  <!-- 5. VICTORY CELEBRATION MODAL -->
+  <div id="victoryModal" class="app-modal fixed inset-0 z-50 bg-black/90 backdrop-blur-lg flex items-center justify-center p-4 hidden">
+    <div class="glass-panel-heavy w-full max-w-sm p-6 flex flex-col items-center text-center shadow-2xl relative border-2 border-primary-neon glow-cyan">
+      
+      <!-- Top Neon Header -->
+      <div class="px-3 py-1 rounded-full bg-secondary-neon/20 border border-secondary-neon text-secondary-neon text-[10px] font-bold uppercase tracking-wider mb-2">
+        MATCH OVER
+      </div>
+
+      <h1 class="font-outfit font-black text-3xl text-primary-neon text-glow uppercase tracking-wider">
+        SET! WINNER!
+      </h1>
+
+      <p id="victoryWinnerName" class="font-outfit font-extrabold text-xl text-on-surface mt-1">
+        YOU WON!
+      </p>
+      <p id="victorySubtext" class="text-xs text-muted mb-2">
+        You collected 4-of-a-Kind first!
+      </p>
+
+      <!-- Streak Banner in Modal -->
+      <div id="victoryStreakBanner" class="mb-4 px-3 py-1.5 rounded-xl bg-surface-high border border-white/10 flex items-center justify-center gap-2">
+        <span class="text-base">🔥</span>
+        <span id="victoryStreakText" class="text-xs font-bold text-primary-neon">Current Streak: 0</span>
+      </div>
+
+      <!-- Winner Avatar Spotlight -->
+      <div class="relative w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-primary-neon via-secondary-neon to-tertiary-neon shadow-2xl glow-cyan mb-4 flex items-center justify-center">
+        <div id="victoryAvatarIcon" class="w-full h-full rounded-full bg-surface-lowest flex items-center justify-center text-4xl">
+          🦊
+        </div>
+        <div class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-primary-neon text-surface-lowest flex items-center justify-center font-bold text-xs shadow">
+          👑
+        </div>
+      </div>
+
+      <!-- Winning 4 Cards Row -->
+      <div class="w-full mb-5">
+        <p class="text-[10px] font-bold text-muted uppercase tracking-wider mb-2">Winning 4-of-a-Kind Hand</p>
+        <div id="winningCardsRow" class="flex justify-center gap-2">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Dual Actions -->
+      <div class="w-full flex flex-col gap-2">
+        <button class="w-full py-3.5 btn-primary text-xs font-black rounded-xl glow-cyan cursor-pointer" onclick="window.setApp.playAgain()">
+          <span class="material-symbols-outlined text-lg">bolt</span>
+          <span>PLAY AGAIN</span>
+        </button>
+        <button class="w-full py-2.5 btn-secondary text-xs font-bold rounded-xl cursor-pointer" onclick="window.setApp.returnToLobby()">
+          <span>RETURN TO LOBBY</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Game Engine Script with Cache-Busting -->
+  <script src="app.js?v=5.0"></script>
+</body>
+</html>
