@@ -80,6 +80,16 @@
       slap() {
         playTone(180, 'square', 0.12, 0.35);
       },
+      slapAlert() {
+        if (!enabled) return;
+        init();
+        if (!ctx) return;
+        try {
+          for (let i = 0; i < 4; i++) {
+            setTimeout(() => playTone(780 + i * 110, 'sawtooth', 0.12, 0.28), i * 85);
+          }
+        } catch (e) {}
+      },
       error() {
         playTone(150, 'sawtooth', 0.2, 0.2);
       }
@@ -93,12 +103,18 @@
     }
   }
 
-  // --- PLAYER PROFILE ---
+  // --- PLAYER PROFILE & AVATAR POOL ---
   const DEFAULT_AVATARS = {
     fox: { name: 'Cyber Fox', icon: '🦊' },
     cat: { name: 'Neon Cat', icon: '🐱' },
     bot: { name: 'Pixel Bot', icon: '🤖' },
-    astro: { name: 'Astro Kid', icon: '🧑‍🚀' }
+    astro: { name: 'Astro Kid', icon: '🧑‍🚀' },
+    ninja: { name: 'Shadow Ninja', icon: '🥷' },
+    panda: { name: 'Robo Panda', icon: '🐼' },
+    wolf: { name: 'Quantum Wolf', icon: '🐺' },
+    viper: { name: 'Turbo Viper', icon: '🐍' },
+    bear: { name: 'Cosmo Bear', icon: '🐻' },
+    punk: { name: 'Cyber Punk', icon: '👾' }
   };
 
   const storedId = localStorage.getItem('set_player_id') || `p_${Math.random().toString(36).substr(2, 8)}`;
@@ -146,7 +162,9 @@
         { name: 'PlasmaRifle', icon: '🔫' },
         { name: 'CyborgArm', icon: '🦾' },
         { name: 'HoloDeck', icon: '🥽' },
-        { name: 'DataNode', icon: '💾' }
+        { name: 'DataNode', icon: '💾' },
+        { name: 'NanoBot', icon: '🤖' },
+        { name: 'PowerShield', icon: '🛡️' }
       ]
     },
     Animals: {
@@ -159,7 +177,9 @@
         { name: 'Elephant', icon: '🐘' },
         { name: 'Panda', icon: '🐼' },
         { name: 'Fox', icon: '🦊' },
-        { name: 'Wolf', icon: '🐺' }
+        { name: 'Wolf', icon: '🐺' },
+        { name: 'Cheetah', icon: '🐆' },
+        { name: 'Eagle', icon: '🦅' }
       ]
     }
   };
@@ -168,6 +188,7 @@
     playerId: storedId,
     playerName: localStorage.getItem('set_player_name') || `Player_${Math.floor(100 + Math.random() * 900)}`,
     playerAvatar: localStorage.getItem('set_player_avatar') || 'fox',
+    playerCount: 6, // Default 6 players for exciting, longer rounds
     activeScreen: 'lobby', // 'lobby' | 'game'
     activeRoom: null,
     selectedCardId: null,
@@ -178,6 +199,11 @@
     pollTimer: null,
     isPassAndPlay: false,
     isSoloBots: false,
+    slapFrenzyActive: false,
+    slapOrder: [],
+    slapFrenzyStartedAt: null,
+    mySlapRank: null,
+    frenzyTimers: [],
     streak: parseInt(localStorage.getItem('set_player_streak') || '0', 10),
     passAndPlayData: null,
     autoPilot: false,
@@ -324,9 +350,14 @@
 
       renderActiveRoom();
       checkTurnNotification();
+    } else if (event === 'slap_frenzy_started') {
+      handleSlapFrenzyStarted(data);
+    } else if (event === 'slap_registered') {
+      handleSlapRegistered(data);
     } else if (event === 'game_over') {
       state.activeRoom = data;
-      showVictoryModal(data);
+      resetSlapFrenzyUi();
+      showWinnerBoard(data);
     } else if (event === 'player_reaction') {
       displayFloatingReaction(data.emoji, data.senderName);
     } else if (event === 'error') {
@@ -682,12 +713,14 @@
     // Calculate circular positions around table
     otherPlayers.forEach((p, idx) => {
       const angle = (idx / Math.max(count, 1)) * 2 * Math.PI - Math.PI / 2;
-      const radius = 105; // radius in px from center
+      const radius = count >= 5 ? 108 : 100; // radius in px from center
       const x = Math.round(radius * Math.cos(angle));
       const y = Math.round(radius * Math.sin(angle));
 
       const isTurn = room.players[room.turn]?.id === p.id;
       const avatarIcon = (DEFAULT_AVATARS[p.avatar] || {}).icon || '🦊';
+      const avatarSize = count >= 5 ? 'w-9 h-9 text-lg' : 'w-11 h-11 text-xl';
+      const nameWidth = count >= 5 ? 'max-w-[55px] text-[10px]' : 'max-w-[70px] text-[11px]';
 
       const seat = document.createElement('div');
       seat.className = 'absolute flex flex-col items-center z-20 transition-all';
@@ -695,9 +728,9 @@
 
       seat.innerHTML = `
         <div class="relative">
-          <div class="w-11 h-11 rounded-full p-[2px] transition-all ${isTurn ? 'glow-cyan ring-2 ring-primary-neon' : 'bg-surface-high border border-white/20'}"
+          <div class="${avatarSize} rounded-full p-[2px] transition-all ${isTurn ? 'glow-cyan ring-2 ring-primary-neon' : 'bg-surface-high border border-white/20'}"
                style="${isTurn ? 'background: linear-gradient(135deg, #ccff00, #2979ff);' : ''}">
-            <div class="w-full h-full rounded-full bg-surface-high flex items-center justify-center text-xl">
+            <div class="w-full h-full rounded-full bg-surface-high flex items-center justify-center">
               ${avatarIcon}
             </div>
           </div>
@@ -706,11 +739,10 @@
             <span>${p.cardCount || 4}</span>
           </div>
         </div>
-        <span class="text-[11px] font-semibold text-on-surface mt-0.5 max-w-[70px] truncate text-center">${p.name}</span>
-        <span class="text-[9px] font-mono px-1 rounded ${isTurn ? 'text-primary-neon bg-primary-neon/10 font-bold animate-pulse' : 'text-muted'}">
+        <span class="${nameWidth} font-semibold text-on-surface mt-0.5 truncate text-center">${p.name}</span>
+        <span class="text-[8px] font-mono px-1 rounded ${isTurn ? 'text-primary-neon bg-primary-neon/10 font-bold animate-pulse' : 'text-muted'}">
           ${isTurn ? (p.isBot ? 'Thinking 🧠' : 'Turn ⚡') : (p.isBot ? 'Bot 🤖' : 'Ready')}
         </span>
-
       `;
       container.appendChild(seat);
     });
@@ -809,6 +841,43 @@
     const btn = document.getElementById('passCardButton');
     if (!btn) return;
 
+    const myPlayer = state.activeRoom?.players.find(p => p.id === state.playerId);
+    const counts = {};
+    (myPlayer?.hand || []).forEach(c => { counts[c.name] = (counts[c.name] || 0) + 1; });
+    const hasFourMatching = Object.values(counts).some(cnt => cnt >= 4);
+
+    // If player has collected 4 matching cards:
+    if (hasFourMatching) {
+      if ((myPlayer?.hand || []).length === 4) {
+        // Pure 4-of-a-kind in hand! Ready to slap!
+        btn.disabled = false;
+        btn.className = 'w-full py-3.5 btn-primary text-xs font-black rounded-xl glow-cyan cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2 ring-2 ring-primary-neon animate-bounce';
+        btn.innerHTML = `
+          <span class="material-symbols-outlined text-[20px]">pan_tool</span>
+          <span>🔥 SET READY! SLAP CENTER PILE NOW! 🔥</span>
+        `;
+        btn.onclick = () => {
+          slapCenterPile();
+        };
+        return;
+      } else {
+        // Holding 4 matching + 1 odd card: pass the odd card and immediately slap!
+        const oddCard = myPlayer?.hand?.find(c => counts[c.name] === 1) || myPlayer?.hand?.[0];
+        btn.disabled = false;
+        btn.className = 'w-full py-3.5 btn-primary text-xs font-black rounded-xl glow-cyan cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2 ring-2 ring-primary-neon';
+        btn.innerHTML = `
+          <span class="material-symbols-outlined text-[20px]">send</span>
+          <span>PASS ${oddCard ? oddCard.name.toUpperCase() : 'ODD'} & SLAP SET! ➔</span>
+        `;
+        btn.onclick = () => {
+          if (oddCard) state.selectedCardId = oddCard.id;
+          passSelectedCard();
+          setTimeout(() => slapCenterPile(), 200);
+        };
+        return;
+      }
+    }
+
     if (!isMyTurn) {
       btn.disabled = true;
       btn.className = 'w-full py-3 bg-surface-high text-muted font-bold rounded-xl cursor-not-allowed opacity-60 flex items-center justify-center gap-2';
@@ -819,7 +888,6 @@
       return;
     }
 
-    const myPlayer = state.activeRoom?.players.find(p => p.id === state.playerId);
     const selCard = myPlayer?.hand?.find(c => c.id === state.selectedCardId) || myPlayer?.hand?.[0];
 
     btn.disabled = false;
@@ -905,6 +973,105 @@
     });
   }
 
+  // --- SLAP FRENZY & EMERGENCY SHOWDOWN SYSTEM ---
+  function handleSlapFrenzyStarted(data) {
+    state.slapFrenzyActive = true;
+    state.slapFrenzyStartedAt = Date.now();
+    state.slapOrder = data.slapOrder || [];
+    state.mySlapRank = state.slapOrder.find(s => (s.playerId || s.id) === state.playerId)?.rank || null;
+
+    AudioEngine.slapAlert();
+    vibrate([250, 100, 250]);
+
+    const ring = document.getElementById('slapFrenzyRing');
+    const tag = document.getElementById('slapStatusTag');
+    const badge = document.getElementById('slapCounterBadge');
+    const countText = document.getElementById('slappedCountText');
+    const slapBtn = document.getElementById('centerSlapPileBtn');
+    const tickerText = document.getElementById('liveActionTickerText');
+
+    if (ring) ring.classList.remove('hidden');
+    if (tag) tag.classList.remove('hidden');
+    if (badge) badge.classList.remove('hidden');
+
+    const total = state.activeRoom?.players?.length || state.playerCount || 6;
+    if (countText) countText.textContent = `${state.slapOrder.length}/${total}`;
+
+    if (slapBtn) {
+      slapBtn.classList.add('glow-cyan', 'ring-4', 'ring-red-500', 'animate-pulse');
+    }
+
+    const initiator = data.initiator;
+    const isMe = initiator && (initiator.id === state.playerId || initiator.playerId === state.playerId);
+
+    if (tickerText) {
+      tickerText.innerHTML = isMe 
+        ? `🔥 <b class="text-yellow-300">YOU CALLED SET!</b> Other players rushing to slap! 🔥` 
+        : `🚨 <b class="text-red-400">${initiator ? initiator.name : 'A Rival'} SLAPPED SET!</b> SLAP THE PILE NOW TO GET 2ND/3RD PLACE! 🚨`;
+    }
+
+    if (isMe) {
+      state.mySlapRank = 1;
+      if (tag) {
+        tag.textContent = '👑 YOU SLAPPED 1ST!';
+        tag.className = 'absolute -top-3.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-yellow-400 text-surface-lowest shadow-lg';
+      }
+    }
+  }
+
+  function handleSlapRegistered(data) {
+    const entry = data.entry;
+    if (data.slapOrder) {
+      state.slapOrder = data.slapOrder;
+    } else if (entry) {
+      if (!state.slapOrder.some(s => (s.playerId || s.id) === (entry.playerId || entry.id))) {
+        state.slapOrder.push(entry);
+      }
+    }
+
+    if (entry && (entry.playerId === state.playerId || entry.id === state.playerId)) {
+      state.mySlapRank = entry.rank;
+      const tag = document.getElementById('slapStatusTag');
+      if (tag) {
+        tag.textContent = `✋ SLAPPED! (Rank #${entry.rank})`;
+        tag.className = 'absolute -top-3.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-primary-neon text-surface-lowest shadow-lg';
+      }
+    }
+
+    const countText = document.getElementById('slappedCountText');
+    const total = data.totalPlayers || state.activeRoom?.players?.length || state.playerCount || 6;
+    if (countText) countText.textContent = `${state.slapOrder.length}/${total}`;
+
+    const tickerText = document.getElementById('liveActionTickerText');
+    if (tickerText && entry) {
+      const timeStr = entry.reactionTimeMs ? `+${(entry.reactionTimeMs / 1000).toFixed(2)}s` : 'Set Caller';
+      tickerText.innerHTML = `✋ <b>${entry.name}</b> slapped! Rank #${entry.rank} (${timeStr})`;
+    }
+    AudioEngine.slap();
+  }
+
+  function resetSlapFrenzyUi() {
+    state.slapFrenzyActive = false;
+    state.frenzyTimers.forEach(clearTimeout);
+    state.frenzyTimers = [];
+
+    const ring = document.getElementById('slapFrenzyRing');
+    const tag = document.getElementById('slapStatusTag');
+    const badge = document.getElementById('slapCounterBadge');
+    const slapBtn = document.getElementById('centerSlapPileBtn');
+
+    if (ring) ring.classList.add('hidden');
+    if (tag) {
+      tag.classList.add('hidden');
+      tag.textContent = '🚨 SLAP NOW!';
+      tag.className = 'hidden absolute -top-3.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-red-600 text-white shadow-lg animate-bounce';
+    }
+    if (badge) badge.classList.add('hidden');
+    if (slapBtn) {
+      slapBtn.classList.remove('glow-cyan', 'ring-4', 'ring-red-500', 'animate-pulse');
+    }
+  }
+
   // Center Slap Pile Trigger
   function slapCenterPile() {
     AudioEngine.slap();
@@ -914,23 +1081,178 @@
     const myPlayer = state.activeRoom.players.find(p => p.id === state.playerId);
     if (!myPlayer) return;
 
-    // Check if player has 4 of a kind
+    // Case 1: Slap Frenzy is currently active! (Rivals are rushing to slap for 2nd, 3rd, 4th place)
+    if (state.slapFrenzyActive) {
+      if (state.slapOrder.some(s => (s.playerId || s.id) === state.playerId)) {
+        showToast('You already slapped! Waiting for final leaderboard...', 'info');
+        return;
+      }
+
+      const reactionTimeMs = Math.max(Date.now() - (state.slapFrenzyStartedAt || Date.now()), 15);
+
+      if (state.isSoloBots) {
+        const rank = state.slapOrder.length + 1;
+        state.mySlapRank = rank;
+        const entry = {
+          playerId: state.playerId,
+          name: state.playerName,
+          avatar: state.playerAvatar,
+          isBot: false,
+          rank,
+          reactionTimeMs,
+          hand: myPlayer.hand || [],
+          isSetCaller: false
+        };
+        handleSlapRegistered({ entry, slapOrder: [...state.slapOrder, entry] });
+
+        if (state.slapOrder.length >= state.activeRoom.players.length) {
+          endSoloGameWithWinnerBoard();
+        }
+      } else {
+        sendWsMessage('slap_pile', {});
+      }
+      return;
+    }
+
+    // Case 2: Regular play - check if player actually holds 4 of a kind!
     const counts = {};
-    myPlayer.hand.forEach(c => { counts[c.name] = (counts[c.name] || 0) + 1; });
-    const hasWon = Object.values(counts).some(cnt => cnt === 4);
+    (myPlayer.hand || []).forEach(c => { counts[c.name] = (counts[c.name] || 0) + 1; });
+    const hasWon = Object.values(counts).some(cnt => cnt >= 4);
 
     if (hasWon) {
-      AudioEngine.victory();
-      showToast('🔥 SET! 4-OF-A-KIND CLAIMED! 🔥', 'success');
-      // Pass card to trigger win validation on server if needed
+      const winningItemName = Object.keys(counts).find(k => counts[k] >= 4);
+      const winningCard = myPlayer.hand.find(c => c.name === winningItemName) || myPlayer.hand[0];
+
+      if (state.isSoloBots) {
+        startSoloSlapFrenzy(myPlayer, winningCard);
+      } else {
+        sendWsMessage('slap_pile', {});
+      }
     } else {
       AudioEngine.error();
-      showToast('Not a 4-of-a-kind SET yet! Keep passing!', 'error');
+      vibrate([150]);
+      showToast('⚠️ FALSE SLAP! Need 4 matching cards before you can slap! Keep passing.', 'error');
     }
   }
 
-  // --- VICTORY CELEBRATION MODAL ---
-  function showVictoryModal(data) {
+  function startSoloSlapFrenzy(initiator, winningCard) {
+    if (state.slapFrenzyActive) return;
+
+    handleSlapFrenzyStarted({
+      initiator: {
+        id: initiator.id,
+        name: initiator.name,
+        avatar: initiator.avatar
+      },
+      winningCard: winningCard || { name: 'Item', icon: '🃏' },
+      slapOrder: [{
+        playerId: initiator.id,
+        name: initiator.name,
+        avatar: initiator.avatar,
+        isBot: initiator.isBot,
+        rank: 1,
+        reactionTimeMs: 0,
+        hand: initiator.hand || [],
+        winningCard: winningCard,
+        isSetCaller: true
+      }]
+    });
+
+    // Schedule AI bots in room to slap with human-like varying reaction times
+    const botSpeedProfiles = {
+      ninja: { min: 450, max: 750 },
+      cat: { min: 600, max: 950 },
+      fox: { min: 700, max: 1100 },
+      astro: { min: 800, max: 1250 },
+      bot: { min: 850, max: 1300 },
+      wolf: { min: 900, max: 1400 },
+      viper: { min: 950, max: 1500 },
+      panda: { min: 1200, max: 1800 },
+      bear: { min: 1400, max: 2100 },
+      punk: { min: 1600, max: 2400 }
+    };
+
+    state.activeRoom.players.forEach(p => {
+      if (p.isBot && p.id !== initiator.id) {
+        const profile = botSpeedProfiles[p.avatar] || { min: 800, max: 1500 };
+        const delay = Math.round(profile.min + Math.random() * (profile.max - profile.min));
+
+        const timer = setTimeout(() => {
+          if (!state.slapFrenzyActive) return;
+          if (state.slapOrder.some(s => (s.playerId || s.id) === p.id)) return;
+
+          const reactionTimeMs = Math.max(Date.now() - state.slapFrenzyStartedAt, delay);
+          const rank = state.slapOrder.length + 1;
+          const entry = {
+            playerId: p.id,
+            name: p.name,
+            avatar: p.avatar,
+            isBot: true,
+            rank,
+            reactionTimeMs,
+            hand: p.hand || [],
+            isSetCaller: false
+          };
+          handleSlapRegistered({ entry, slapOrder: [...state.slapOrder, entry] });
+
+          if (state.slapOrder.length >= state.activeRoom.players.length) {
+            endSoloGameWithWinnerBoard();
+          }
+        }, delay);
+
+        state.frenzyTimers.push(timer);
+      }
+    });
+
+    // Max Frenzy Safety Timer (4.0s)
+    const timeout = setTimeout(() => {
+      if (state.slapFrenzyActive) {
+        endSoloGameWithWinnerBoard();
+      }
+    }, 4000);
+    state.frenzyTimers.push(timeout);
+  }
+
+  function endSoloGameWithWinnerBoard() {
+    if (!state.activeRoom) return;
+    const room = state.activeRoom;
+    room.status = 'gameover';
+
+    resetSlapFrenzyUi();
+
+    // Any player who didn't slap is appended to the bottom
+    const slappedIds = new Set(state.slapOrder.map(s => s.playerId || s.id));
+    room.players.forEach(p => {
+      if (!slappedIds.has(p.id)) {
+        state.slapOrder.push({
+          playerId: p.id,
+          name: p.name,
+          avatar: p.avatar,
+          isBot: p.isBot,
+          rank: state.slapOrder.length + 1,
+          reactionTimeMs: 9999,
+          hand: p.hand || [],
+          failedToSlap: true,
+          isSetCaller: false
+        });
+      }
+    });
+
+    const winner = state.slapOrder[0];
+    showWinnerBoard({
+      winner: {
+        id: winner.playerId,
+        name: winner.name,
+        avatar: winner.avatar,
+        hand: winner.hand
+      },
+      winningCard: winner.winningCard || winner.hand?.[0] || { name: 'Item', icon: '🍓' },
+      winnerBoard: state.slapOrder
+    });
+  }
+
+  // --- WINNER BOARD & LEADERBOARD CELEBRATION MODAL ---
+  function showWinnerBoard(data) {
     AudioEngine.victory();
     vibrate([200, 100, 300, 100, 400]);
 
@@ -938,8 +1260,9 @@
     if (!modal) return;
 
     const winner = data.winner || {};
-    const isMe = winner.id === state.playerId;
+    const isMe = (winner.id || winner.playerId) === state.playerId;
     const winningCard = data.winningCard || { name: 'Item', icon: '🍓' };
+    const winnerBoard = (data.winnerBoard || []).sort((a, b) => a.rank - b.rank);
 
     // Update Player Streak
     if (isMe) {
@@ -957,24 +1280,88 @@
     const streakText = document.getElementById('victoryStreakText');
     if (streakText) {
       streakText.innerHTML = isMe 
-        ? `🔥 Win Streak: <b>${state.streak}</b> (+1 Streak Bonus!)` 
-        : `Streak Broken! Current: <b>0</b> (Winner: ${winner.name || 'Bot'})`;
+        ? `🔥 Win Streak: <b>${state.streak}</b> (+1 Streak Champion!)` 
+        : `Streak: <b>0</b> (Champion: ${winner.name || 'Bot'})`;
     }
 
     document.getElementById('victoryWinnerName').textContent = isMe ? 'YOU WON!' : `${winner.name} WINS!`;
-    document.getElementById('victorySubtext').textContent = isMe ? 'You collected 4-of-a-Kind first!' : `${winner.name} collected 4 ${winningCard.name}s first!`;
+    document.getElementById('victorySubtext').textContent = isMe 
+      ? 'You collected 4-of-a-Kind and slapped first!' 
+      : `${winner.name} collected 4x ${winningCard.name} & slapped first!`;
     document.getElementById('victoryAvatarIcon').textContent = (DEFAULT_AVATARS[winner.avatar] || {}).icon || '🦊';
 
     // Show 4 winning cards
     const cardsRow = document.getElementById('winningCardsRow');
     if (cardsRow) {
       cardsRow.innerHTML = [1, 2, 3, 4].map(() => `
-        <div class="w-14 h-20 rounded-xl p-1 bg-surface-high border-2 border-primary-neon flex flex-col justify-between items-center shadow-lg glow-cyan-sm">
-          <span class="text-[9px] font-bold text-primary-neon">SET</span>
-          <span class="text-2xl">${winningCard.icon || '🍓'}</span>
-          <span class="text-[9px] font-bold text-on-surface truncate">${winningCard.name}</span>
+        <div class="w-12 h-16 rounded-xl p-1 bg-surface-high border-2 border-primary-neon flex flex-col justify-between items-center shadow-lg glow-cyan-sm">
+          <span class="text-[8px] font-bold text-primary-neon">SET</span>
+          <span class="text-xl">${winningCard.icon || '🍓'}</span>
+          <span class="text-[8px] font-bold text-on-surface truncate">${winningCard.name}</span>
         </div>
       `).join('');
+    }
+
+    // Render Full Standings List (1st, 2nd, 3rd, 4th... Donkey)
+    const listContainer = document.getElementById('winnerBoardStandingsList');
+    if (listContainer) {
+      listContainer.innerHTML = '';
+
+      winnerBoard.forEach((p, idx) => {
+        const rank = p.rank || (idx + 1);
+        const isPlayerMe = (p.playerId || p.id) === state.playerId;
+        const isCaller = p.isSetCaller || rank === 1;
+        const isLast = rank === winnerBoard.length && winnerBoard.length > 2;
+
+        let rankBadgeHtml = '';
+        let rowBorderClass = 'border-white/10 bg-surface-high/60';
+        let speedText = p.reactionTimeMs && p.reactionTimeMs < 9000 
+          ? `+${(p.reactionTimeMs / 1000).toFixed(2)}s` 
+          : (isCaller ? '0.00s' : 'No Slap');
+
+        if (rank === 1) {
+          rankBadgeHtml = `<span class="px-2 py-0.5 rounded-full bg-yellow-400 text-surface-lowest text-[10px] font-black">🥇 1ST</span>`;
+          rowBorderClass = 'border-yellow-400/50 bg-yellow-400/10 shadow glow-cyan-sm';
+          speedText = '👑 SET CALLER';
+        } else if (rank === 2) {
+          rankBadgeHtml = `<span class="px-2 py-0.5 rounded-full bg-slate-300 text-surface-lowest text-[10px] font-black">🥈 2ND</span>`;
+          rowBorderClass = 'border-slate-300/40 bg-slate-400/10';
+        } else if (rank === 3) {
+          rankBadgeHtml = `<span class="px-2 py-0.5 rounded-full bg-amber-600 text-white text-[10px] font-black">🥉 3RD</span>`;
+          rowBorderClass = 'border-amber-600/30 bg-amber-600/10';
+        } else if (isLast) {
+          rankBadgeHtml = `<span class="px-2 py-0.5 rounded-full bg-red-600/30 text-red-400 border border-red-500/50 text-[10px] font-black">🫏 LAST</span>`;
+          rowBorderClass = 'border-red-500/30 bg-red-950/20';
+          speedText = 'Slowest Slapper';
+        } else {
+          rankBadgeHtml = `<span class="px-2 py-0.5 rounded-full bg-surface-lowest border border-white/20 text-muted text-[10px] font-bold">#${rank}</span>`;
+        }
+
+        const avatarIcon = (DEFAULT_AVATARS[p.avatar] || {}).icon || '🦊';
+
+        const row = document.createElement('div');
+        row.className = `p-2 rounded-xl border flex items-center justify-between text-xs transition-all ${rowBorderClass} ${isPlayerMe ? 'ring-2 ring-primary-neon' : ''}`;
+        row.innerHTML = `
+          <div class="flex items-center gap-2">
+            ${rankBadgeHtml}
+            <div class="w-7 h-7 rounded-full bg-surface-lowest flex items-center justify-center text-base border border-white/10">
+              ${avatarIcon}
+            </div>
+            <div class="flex flex-col text-left">
+              <span class="font-bold text-on-surface flex items-center gap-1">
+                ${p.name}
+                ${isPlayerMe ? '<span class="px-1 rounded bg-primary-neon text-surface-lowest text-[8px] font-black">YOU</span>' : (p.isBot ? '<span class="text-[9px] text-muted">🤖</span>' : '')}
+              </span>
+              <span class="text-[9px] text-muted">${isCaller ? 'Collected 4x SET' : 'Slapped Pile'}</span>
+            </div>
+          </div>
+          <div class="text-right flex flex-col items-end">
+            <span class="font-mono font-bold text-[11px] ${rank === 1 ? 'text-yellow-300' : (isLast ? 'text-red-400' : 'text-primary-neon')}">${speedText}</span>
+            <span class="text-[8px] text-muted">${rank === 1 ? 'Winner' : `Place #${rank}`}</span>
+          </div>
+        `;
+        listContainer.appendChild(row);
+      });
     }
 
     // Trigger Confetti
@@ -1112,37 +1499,79 @@
     sendWsMessage('join_room', { roomId });
   }
 
+  function setPlayerCount(count) {
+    state.playerCount = Math.min(Math.max(Number(count) || 6, 4), 8);
+    [4, 6, 8].forEach(n => {
+      const btn = document.getElementById(`countBtn${n}`);
+      if (btn) {
+        if (n === state.playerCount) {
+          btn.className = 'player-count-btn active-count-btn px-2.5 py-1 rounded-lg text-[10px] font-bold bg-primary-neon text-surface-lowest transition-all cursor-pointer glow-cyan-sm';
+        } else {
+          btn.className = 'player-count-btn px-2.5 py-1 rounded-lg text-[10px] font-bold bg-surface-lowest text-muted border border-white/10 transition-all cursor-pointer';
+        }
+      }
+    });
+    const heroBtnText = document.getElementById('quickPlayBtnText');
+    if (heroBtnText) {
+      heroBtnText.textContent = `PLAY VS ${state.playerCount - 1} BOTS (${state.playerCount}P)`;
+    }
+    AudioEngine.cardSelect();
+  }
+
   // Quick Play against AI bots (Instant, responsive, smart AI bots)
   function triggerQuickPlay() {
-    startSoloBotMatch();
+    if (state.ws && state.ws.readyState === WebSocket.OPEN) {
+      state.isPassAndPlay = false;
+      state.isSoloBots = false;
+      sendWsMessage('quick_play', {
+        data: {
+          name: state.playerName,
+          avatar: state.playerAvatar,
+          category: state.selectedCategory,
+          playerCount: state.playerCount
+        }
+      });
+    } else {
+      startSoloBotMatch();
+    }
   }
 
   function startSoloBotMatch() {
     state.isPassAndPlay = false;
     state.isSoloBots = true;
+    resetSlapFrenzyUi();
     AudioEngine.cardSelect();
     vibrate([40]);
 
     const cat = state.categories[state.selectedCategory] || state.categories['Fruits'];
-    const botPool = [
-      { name: 'Cyber Fox', avatar: 'fox' },
-      { name: 'Pixel Bot', avatar: 'bot' },
-      { name: 'Astro Kid', avatar: 'astro' },
-      { name: 'Neon Cat', avatar: 'cat' }
-    ].filter(b => b.avatar !== state.playerAvatar).slice(0, 3);
+    const numPlayers = Math.min(Math.max(state.playerCount || 6, 4), 8);
 
-    while (botPool.length < 3) {
-      botPool.push({ name: `Bot_${botPool.length + 1}`, avatar: 'bot' });
+    const allBots = [
+      { name: 'Shadow Ninja', avatar: 'ninja' },
+      { name: 'Neon Cat', avatar: 'cat' },
+      { name: 'Cyber Fox', avatar: 'fox' },
+      { name: 'Astro Kid', avatar: 'astro' },
+      { name: 'Pixel Bot', avatar: 'bot' },
+      { name: 'Quantum Wolf', avatar: 'wolf' },
+      { name: 'Turbo Viper', avatar: 'viper' },
+      { name: 'Robo Panda', avatar: 'panda' },
+      { name: 'Cosmo Bear', avatar: 'bear' },
+      { name: 'Cyber Punk', avatar: 'punk' }
+    ].filter(b => b.avatar !== state.playerAvatar);
+
+    const chosenBots = allBots.slice(0, numPlayers - 1);
+    while (chosenBots.length < numPlayers - 1) {
+      chosenBots.push({ name: `Bot_${chosenBots.length + 1}`, avatar: 'bot' });
     }
 
-    // Pick 4 unique items for the 4 players
+    // Pick numPlayers unique items for the players
     const shuffledItems = [...cat.items].sort(() => Math.random() - 0.5);
-    const selectedItems = shuffledItems.slice(0, 4);
-    while (selectedItems.length < 4) {
+    const selectedItems = shuffledItems.slice(0, numPlayers);
+    while (selectedItems.length < numPlayers) {
       selectedItems.push({ name: `Item ${selectedItems.length + 1}`, icon: '⭐' });
     }
 
-    // Build 16 cards (4 items * 4 duplicates)
+    // Build deck (numPlayers * 4 cards)
     const deck = [];
     selectedItems.forEach(item => {
       for (let i = 0; i < 4; i++) {
@@ -1154,7 +1583,7 @@
     });
     deck.sort(() => Math.random() - 0.5);
 
-    // 4 Players: Human + 3 Smart AI Bots
+    // Human + AI Bots
     const players = [
       {
         id: state.playerId,
@@ -1162,41 +1591,53 @@
         avatar: state.playerAvatar,
         isHost: true,
         isBot: false,
-        hand: deck.slice(0, 4)
-      },
-      {
-        id: 'bot-1',
-        name: botPool[0].name,
-        avatar: botPool[0].avatar,
-        isHost: false,
-        isBot: true,
-        hand: deck.slice(4, 8)
-      },
-      {
-        id: 'bot-2',
-        name: botPool[1].name,
-        avatar: botPool[1].avatar,
-        isHost: false,
-        isBot: true,
-        hand: deck.slice(8, 12)
-      },
-      {
-        id: 'bot-3',
-        name: botPool[2].name,
-        avatar: botPool[2].avatar,
-        isHost: false,
-        isBot: true,
-        hand: deck.slice(12, 16)
+        hand: []
       }
     ];
 
+    chosenBots.forEach((b, i) => {
+      players.push({
+        id: `bot-${i + 1}`,
+        name: b.name,
+        avatar: b.avatar,
+        isHost: false,
+        isBot: true,
+        hand: []
+      });
+    });
+
+    // Deal cards round-robin
+    for (let i = 0; i < deck.length; i++) {
+      players[i % numPlayers].hand.push(deck[i]);
+    }
+
+    // Ensure NO player starts with 4 matching cards on turn 0!
+    let hadFour = true;
+    let attempts = 0;
+    while (hadFour && attempts < 30) {
+      hadFour = false;
+      attempts++;
+      for (let pIdx = 0; pIdx < numPlayers; pIdx++) {
+        const p = players[pIdx];
+        const counts = {};
+        p.hand.forEach(c => { counts[c.name] = (counts[c.name] || 0) + 1; });
+        if (Object.values(counts).some(cnt => cnt >= 4)) {
+          hadFour = true;
+          const nextP = players[(pIdx + 1) % numPlayers];
+          const swapCard = p.hand.pop();
+          p.hand.push(nextP.hand.pop());
+          nextP.hand.push(swapCard);
+        }
+      }
+    }
+
     state.activeRoom = {
       id: Math.floor(1000 + Math.random() * 9000).toString(),
-      name: 'Bot Battle Arena',
+      name: `${numPlayers}-Player Bot Arena`,
       category: state.selectedCategory,
       passDirection: 'clockwise',
       status: 'playing',
-      turn: Math.floor(Math.random() * 4),
+      turn: Math.floor(Math.random() * numPlayers),
       round: 1,
       players,
       botTimers: []
@@ -1205,26 +1646,14 @@
     showGameScreen();
     renderActiveRoom();
     AudioEngine.cardReceive();
-    showToast('Match Started! Pass your odd card to win!', 'success');
-
-    // Instant win check on deal
-    for (const p of players) {
-      const counts = {};
-      p.hand.forEach(c => { counts[c.name] = (counts[c.name] || 0) + 1; });
-      if (Object.values(counts).some(cnt => cnt === 4)) {
-        state.activeRoom.status = 'gameover';
-        renderActiveRoom();
-        showVictoryModal({ winner: p, winningCard: p.hand[0] });
-        return;
-      }
-    }
+    showToast(`Arena Started with ${numPlayers} Players! Match cards & slap the pile!`, 'success');
 
     scheduleSoloBotTurn();
   }
 
   function scheduleSoloBotTurn() {
     const room = state.activeRoom;
-    if (!room || room.status !== 'playing' || !state.isSoloBots) return;
+    if (!room || room.status !== 'playing' || !state.isSoloBots || state.slapFrenzyActive) return;
 
     if (room.botTimers) {
       room.botTimers.forEach(clearTimeout);
@@ -1235,9 +1664,9 @@
     if (!currentTurnPlayer) return;
 
     if (currentTurnPlayer.isBot) {
-      const delay = 1000 + Math.random() * 500;
+      const delay = 900 + Math.random() * 500;
       const timer = setTimeout(() => {
-        if (!state.activeRoom || state.activeRoom.status !== 'playing' || !state.isSoloBots) return;
+        if (!state.activeRoom || state.activeRoom.status !== 'playing' || !state.isSoloBots || state.slapFrenzyActive) return;
         executeSoloBotMove(currentTurnPlayer);
       }, delay);
       room.botTimers.push(timer);
@@ -1245,7 +1674,7 @@
       // Auto-Pilot execution if enabled
       if (state.autoPilot) {
         const autoTimer = setTimeout(() => {
-          if (!state.activeRoom || state.activeRoom.status !== 'playing' || !state.isSoloBots) return;
+          if (!state.activeRoom || state.activeRoom.status !== 'playing' || !state.isSoloBots || state.slapFrenzyActive) return;
           passSelectedCard();
         }, 800);
         room.botTimers.push(autoTimer);
@@ -1255,16 +1684,24 @@
 
   function executeSoloBotMove(botPlayer) {
     const room = state.activeRoom;
-    if (!room || room.status !== 'playing') return;
+    if (!room || room.status !== 'playing' || state.slapFrenzyActive) return;
+
+    // Check if bot already has 4-of-a-kind: bot slaps!
+    const currentCounts = {};
+    botPlayer.hand.forEach(c => { currentCounts[c.name] = (currentCounts[c.name] || 0) + 1; });
+    if (Object.values(currentCounts).some(cnt => cnt >= 4)) {
+      const winItem = Object.keys(currentCounts).find(k => currentCounts[k] >= 4);
+      const winCard = botPlayer.hand.find(c => c.name === winItem) || botPlayer.hand[0];
+      startSoloSlapFrenzy(botPlayer, winCard);
+      return;
+    }
 
     // Smart Bot AI: Find least frequent item in hand
-    const counts = {};
-    botPlayer.hand.forEach(c => { counts[c.name] = (counts[c.name] || 0) + 1; });
     let lowestCount = 999;
     let cardToPass = botPlayer.hand[0];
     for (const card of botPlayer.hand) {
-      if (counts[card.name] < lowestCount) {
-        lowestCount = counts[card.name];
+      if (currentCounts[card.name] < lowestCount) {
+        lowestCount = currentCounts[card.name];
         cardToPass = card;
       }
     }
@@ -1286,14 +1723,24 @@
       if (tickerText) tickerText.innerHTML = `🔄 <b>${botPlayer.name}</b> passed to <b>${receiver.name}</b> ➔`;
     }
 
-    // Win check
+    // Check if receiver (bot) just got 4-of-a-kind
     const receiverCounts = {};
     receiver.hand.forEach(c => { receiverCounts[c.name] = (receiverCounts[c.name] || 0) + 1; });
-    if (Object.values(receiverCounts).some(cnt => cnt === 4)) {
-      room.status = 'gameover';
-      renderActiveRoom();
-      showVictoryModal({ winner: receiver, winningCard: passed });
-      return;
+    if (Object.values(receiverCounts).some(cnt => cnt >= 4)) {
+      if (receiver.isBot) {
+        // Bot realizes it has 4 of a kind and slaps pile after realistic reaction delay
+        const slapDelay = 650 + Math.random() * 450;
+        const slapTimer = setTimeout(() => {
+          if (!state.slapFrenzyActive && room.status === 'playing') {
+            const stillCounts = {};
+            receiver.hand.forEach(c => { stillCounts[c.name] = (stillCounts[c.name] || 0) + 1; });
+            if (Object.values(stillCounts).some(cnt => cnt >= 4)) {
+              startSoloSlapFrenzy(receiver, passed);
+            }
+          }
+        }, slapDelay);
+        room.botTimers.push(slapTimer);
+      }
     }
 
     room.turn = nextIndex;
@@ -1304,7 +1751,7 @@
 
   function handleSoloHumanPass() {
     const room = state.activeRoom;
-    if (!room || room.status !== 'playing') return;
+    if (!room || room.status !== 'playing' || state.slapFrenzyActive) return;
 
     const myPlayer = room.players.find(p => p.id === state.playerId);
     if (!myPlayer) return;
@@ -1338,14 +1785,29 @@
     const tickerText = document.getElementById('liveActionTickerText');
     if (tickerText) tickerText.innerHTML = `⚡ You passed <b>${passed.name}</b> to <b>${receiver.name}</b> ➔`;
 
-    // Win check
+    // Check if human now holds 4-of-a-kind (after sending the odd card!)
+    const myCounts = {};
+    myPlayer.hand.forEach(c => { myCounts[c.name] = (myCounts[c.name] || 0) + 1; });
+    if (Object.values(myCounts).some(cnt => cnt >= 4)) {
+      state.selectedCardId = null;
+      renderActiveRoom();
+      showToast('🔥 SET COMPLETE! SLAP THE CENTER PILE! 🔥', 'success');
+      return;
+    }
+
+    // Check if receiver (bot) just got 4-of-a-kind
     const receiverCounts = {};
     receiver.hand.forEach(c => { receiverCounts[c.name] = (receiverCounts[c.name] || 0) + 1; });
-    if (Object.values(receiverCounts).some(cnt => cnt === 4)) {
-      room.status = 'gameover';
-      renderActiveRoom();
-      showVictoryModal({ winner: receiver, winningCard: passed });
-      return;
+    if (Object.values(receiverCounts).some(cnt => cnt >= 4)) {
+      if (receiver.isBot) {
+        const slapDelay = 700 + Math.random() * 400;
+        const slapTimer = setTimeout(() => {
+          if (!state.slapFrenzyActive && room.status === 'playing') {
+            startSoloSlapFrenzy(receiver, passed);
+          }
+        }, slapDelay);
+        room.botTimers.push(slapTimer);
+      }
     }
 
     state.selectedCardId = null;
@@ -1415,9 +1877,17 @@
     const isWin = Object.values(counts).some(cnt => cnt === 4);
 
     if (isWin) {
-      showVictoryModal({
+      showWinnerBoard({
         winner: nextP,
-        winningCard: passedCard
+        winningCard: passedCard,
+        winnerBoard: data.players.map((p, idx) => ({
+          playerId: p.id,
+          name: p.name,
+          avatar: p.avatar,
+          rank: p.id === nextP.id ? 1 : idx + 2,
+          reactionTimeMs: p.id === nextP.id ? 0 : 850 * (idx + 1),
+          isSetCaller: p.id === nextP.id
+        }))
       });
       return;
     }
@@ -1576,6 +2046,7 @@
     },
     sendReaction,
     slapCenterPile,
+    setPlayerCount,
     startPassAndPlay,
     openCustomDeckModal,
     closeCustomDeckModal,

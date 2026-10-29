@@ -285,3 +285,27 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Slap Frenzy Emergency Beacon */
+@keyframes slap-strobe {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.9), 0 0 50px rgba(204, 255, 0, 0.6);
+    border-color: #ef4444;
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(204, 255, 0, 0.95), 0 0 70px rgba(239, 68, 68, 0.8);
+    border-color: #ccff00;
+  }
+}
+
+.center-slap-frenzy {
+  animation: slap-strobe 0.4s infinite alternate ease-in-out;
+}
+
+/* Arena Size Toggle Buttons */
+.player-count-btn {
+  user-select: none;
+}
+.player-count-btn:active {
+  transform: scale(0.94);
+}

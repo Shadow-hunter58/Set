@@ -52,7 +52,9 @@ const PRESET_CATEGORIES = {
       { name: 'PlasmaRifle', icon: '🔫' },
       { name: 'CyborgArm', icon: '🦾' },
       { name: 'HoloDeck', icon: '🥽' },
-      { name: 'DataNode', icon: '💾' }
+      { name: 'DataNode', icon: '💾' },
+      { name: 'NanoBot', icon: '🤖' },
+      { name: 'PowerShield', icon: '🛡️' }
     ]
   },
   Animals: {
@@ -65,7 +67,9 @@ const PRESET_CATEGORIES = {
       { name: 'Elephant', icon: '🐘' },
       { name: 'Panda', icon: '🐼' },
       { name: 'Fox', icon: '🦊' },
-      { name: 'Wolf', icon: '🐺' }
+      { name: 'Wolf', icon: '🐺' },
+      { name: 'Cheetah', icon: '🐆' },
+      { name: 'Eagle', icon: '🦅' }
     ]
   }
 };
@@ -301,12 +305,13 @@ function createRoom(options = {}) {
   const code = options.code || generateRoomCode();
   const categories = getAllCategories();
   const categoryName = options.category && categories[options.category] ? options.category : 'Fruits';
+  const maxPlayers = Math.min(Math.max(options.maxPlayers || options.playerCount || 6, 2), 8);
 
   const room = {
     id: code,
     name: options.name || `Arena #${code}`,
     category: categoryName,
-    maxPlayers: Math.min(Math.max(options.maxPlayers || 4, 2), 8),
+    maxPlayers: maxPlayers,
     passDirection: 'clockwise',
     status: 'waiting',
     players: [],
@@ -316,6 +321,11 @@ function createRoom(options = {}) {
     turnStartedAt: null,
     winner: null,
     winningCard: null,
+    slapOrder: [],
+    slapFrenzyStartedAt: null,
+    slapFrenzyTimer: null,
+    firstSetPlayer: null,
+    botSlapScheduled: false,
     startedAt: null,
     endedAt: null,
     subscribers: new Set(),
@@ -364,6 +374,13 @@ function getSanitizedRoomState(room, forPlayerId = null) {
       avatar: room.winner.avatar
     } : null,
     winningCard: room.winningCard,
+    slapOrder: room.slapOrder || [],
+    slapFrenzyStartedAt: room.slapFrenzyStartedAt,
+    firstSetPlayer: room.firstSetPlayer ? {
+      id: room.firstSetPlayer.id,
+      name: room.firstSetPlayer.name,
+      avatar: room.firstSetPlayer.avatar
+    } : null,
     startedAt: room.startedAt,
     players: room.players.map((p, index) => {
       const numHumans = room.players.filter(x => !x.isBot).length;
@@ -415,11 +432,40 @@ function startRoomGame(room) {
     room.players[i % numPlayers].hand.push(deck[i]);
   }
 
+  // Ensure NO player is dealt 4 matching cards on turn 0 so the game does not end immediately
+  let hadFour = true;
+  let attempts = 0;
+  while (hadFour && attempts < 30) {
+    hadFour = false;
+    attempts++;
+    for (let pIdx = 0; pIdx < numPlayers; pIdx++) {
+      const p = room.players[pIdx];
+      const counts = {};
+      p.hand.forEach(c => counts[c.name] = (counts[c.name] || 0) + 1);
+      if (Object.values(counts).some(cnt => cnt >= 4)) {
+        hadFour = true;
+        const nextP = room.players[(pIdx + 1) % numPlayers];
+        const swapCard = p.hand.pop();
+        p.hand.push(nextP.hand.pop());
+        nextP.hand.push(swapCard);
+      }
+    }
+  }
+
   room.status = 'playing';
   room.startedAt = Date.now();
   room.turnStartedAt = Date.now();
   room.winner = null;
   room.winningCard = null;
+  room.slapOrder = [];
+  room.slapFrenzyStartedAt = null;
+  room.firstSetPlayer = null;
+  room.botSlapScheduled = false;
+
+  if (room.slapFrenzyTimer) {
+    clearTimeout(room.slapFrenzyTimer);
+    room.slapFrenzyTimer = null;
+  }
 
   // Clear any existing bot timers
   room.botTimers.forEach(clearTimeout);
@@ -430,15 +476,6 @@ function startRoomGame(room) {
 
   console.log(`[GAME] Initial turn is Player ${room.turn}: ${room.players[room.turn].name} (isBot: ${room.players[room.turn].isBot})`);
 
-  // Instant win check on deal
-  for (const p of room.players) {
-    const winningCard = checkWinner(p.hand);
-    if (winningCard) {
-      endRoomGame(room, p, winningCard);
-      return true;
-    }
-  }
-
   // Broadcast to all clients with their respective hands
   broadcastToRoom(room, 'game_started', (pId) => getSanitizedRoomState(room, pId));
 
@@ -447,25 +484,203 @@ function startRoomGame(room) {
   return true;
 }
 
-function endRoomGame(room, winnerPlayer, winningCard) {
-  console.log(`[GAME] Match ended! Winner: ${winnerPlayer.name} with 4x ${winningCard.name}`);
+// Triggered when someone holding 4-of-a-kind slaps the pile
+function triggerSlapFrenzy(room, initiator, winningCard) {
+  if (room.status === 'slap_frenzy' || room.status === 'gameover') return;
+
+  console.log(`[SLAP FRENZY] Initiated by ${initiator.name} with 4x ${winningCard.name}!`);
+  room.status = 'slap_frenzy';
+  room.slapFrenzyStartedAt = Date.now();
+  room.firstSetPlayer = initiator;
+  room.winningCard = winningCard;
+
+  // Clear turn timers
+  room.botTimers.forEach(clearTimeout);
+  room.botTimers = [];
+
+  // Initiator is Rank 1 (1st Winner)
+  room.slapOrder = [{
+    playerId: initiator.id,
+    name: initiator.name,
+    avatar: initiator.avatar,
+    isBot: initiator.isBot,
+    rank: 1,
+    reactionTimeMs: 0,
+    hand: initiator.hand || [],
+    winningCard: winningCard,
+    isSetCaller: true
+  }];
+
+  broadcastToRoom(room, 'slap_frenzy_started', (pId) => ({
+    initiator: {
+      id: initiator.id,
+      name: initiator.name,
+      avatar: initiator.avatar
+    },
+    winningCard: winningCard,
+    slapOrder: room.slapOrder,
+    roomState: getSanitizedRoomState(room, pId)
+  }));
+
+  // Dynamic reaction speeds for bots
+  const botSpeedProfiles = {
+    ninja: { min: 450, max: 750 },
+    cat: { min: 600, max: 950 },
+    fox: { min: 700, max: 1100 },
+    astro: { min: 800, max: 1250 },
+    bot: { min: 850, max: 1300 },
+    wolf: { min: 900, max: 1400 },
+    viper: { min: 950, max: 1500 },
+    panda: { min: 1200, max: 1800 },
+    bear: { min: 1400, max: 2100 },
+    punk: { min: 1600, max: 2400 }
+  };
+
+  room.players.forEach(p => {
+    if (p.isBot && p.id !== initiator.id) {
+      const profile = botSpeedProfiles[p.avatar] || { min: 800, max: 1500 };
+      const delay = Math.round(profile.min + Math.random() * (profile.max - profile.min));
+
+      const timer = setTimeout(() => {
+        if (room.status !== 'slap_frenzy') return;
+        if (room.slapOrder.some(s => s.playerId === p.id)) return;
+
+        handleSlapPile(room, p.id);
+      }, delay);
+
+      room.botTimers.push(timer);
+    }
+  });
+
+  // Safety Frenzy Timer: max 4.0s
+  room.slapFrenzyTimer = setTimeout(() => {
+    if (room.status === 'slap_frenzy') {
+      console.log(`[SLAP FRENZY] Time limit reached! Finalizing winner board.`);
+      endRoomGameWithWinnerBoard(room);
+    }
+  }, 4000);
+}
+
+function handleSlapPile(room, playerId) {
+  if (!room || (room.status !== 'playing' && room.status !== 'slap_frenzy')) {
+    return { error: 'Game not active' };
+  }
+
+  const player = room.players.find(p => p.id === playerId);
+  if (!player) return { error: 'Player not found' };
+
+  if (room.status === 'playing') {
+    // Check if player holds 4-of-a-kind
+    const winningCard = checkWinner(player.hand);
+    if (!winningCard) {
+      console.log(`[SLAP] False slap by ${player.name} (no 4-of-a-kind)`);
+      return { error: 'false_slap', message: 'No 4-of-a-kind SET! Keep passing.' };
+    }
+    // Valid initial slap! Start the Slap Frenzy!
+    triggerSlapFrenzy(room, player, winningCard);
+    return { success: true, rank: 1 };
+  }
+
+  if (room.status === 'slap_frenzy') {
+    // Slap Frenzy is in progress! Register player's slap
+    if (room.slapOrder.some(s => s.playerId === playerId)) {
+      return { alreadySlapped: true };
+    }
+
+    const reactionTimeMs = Math.max(Date.now() - room.slapFrenzyStartedAt, 10);
+    const rank = room.slapOrder.length + 1;
+    const entry = {
+      playerId: player.id,
+      name: player.name,
+      avatar: player.avatar,
+      isBot: player.isBot,
+      rank,
+      reactionTimeMs,
+      hand: player.hand || [],
+      isSetCaller: false
+    };
+
+    room.slapOrder.push(entry);
+    console.log(`[SLAP FRENZY] ${player.name} slapped pile! Rank #${rank} (${(reactionTimeMs / 1000).toFixed(2)}s)`);
+
+    broadcastToRoom(room, 'slap_registered', () => ({
+      entry,
+      slapOrder: room.slapOrder,
+      totalPlayers: room.players.length
+    }));
+
+    // If all players have slapped, finish immediately!
+    if (room.slapOrder.length >= room.players.length) {
+      if (room.slapFrenzyTimer) clearTimeout(room.slapFrenzyTimer);
+      endRoomGameWithWinnerBoard(room);
+    }
+
+    return { success: true, rank };
+  }
+}
+
+function scheduleBotSlap(room, bot, winningCard) {
+  if (room.status !== 'playing' || room.botSlapScheduled) return;
+  room.botSlapScheduled = true;
+  // Bot realizes it has 4-of-a-kind after realistic thinking delay (600ms - 1100ms) and slaps
+  const delay = 600 + Math.random() * 500;
+  const timer = setTimeout(() => {
+    room.botSlapScheduled = false;
+    if (room.status === 'playing') {
+      const stillHasWin = checkWinner(bot.hand);
+      if (stillHasWin) {
+        triggerSlapFrenzy(room, bot, stillHasWin);
+      }
+    }
+  }, delay);
+  room.botTimers.push(timer);
+}
+
+function endRoomGameWithWinnerBoard(room) {
+  if (room.status === 'gameover') return;
+  console.log(`[GAME] Match ended in room #${room.id}! Calculating final winner board.`);
+
   room.status = 'gameover';
   room.endedAt = Date.now();
-  room.winner = winnerPlayer;
-  room.winningCard = winningCard;
 
   room.botTimers.forEach(clearTimeout);
   room.botTimers = [];
+  if (room.slapFrenzyTimer) {
+    clearTimeout(room.slapFrenzyTimer);
+    room.slapFrenzyTimer = null;
+  }
+
+  // Any players who didn't slap within the frenzy time are placed at the bottom
+  const slappedPlayerIds = new Set(room.slapOrder.map(s => s.playerId));
+  room.players.forEach(p => {
+    if (!slappedPlayerIds.has(p.id)) {
+      room.slapOrder.push({
+        playerId: p.id,
+        name: p.name,
+        avatar: p.avatar,
+        isBot: p.isBot,
+        rank: room.slapOrder.length + 1,
+        reactionTimeMs: 9999,
+        hand: p.hand || [],
+        failedToSlap: true,
+        isSetCaller: false
+      });
+    }
+  });
+
+  const winner = room.slapOrder[0];
+  room.winner = winner;
 
   broadcastToRoom(room, 'game_over', (pId) => ({
     ...getSanitizedRoomState(room, pId),
     winner: {
-      id: winnerPlayer.id,
-      name: winnerPlayer.name,
-      avatar: winnerPlayer.avatar,
-      hand: winnerPlayer.hand
+      id: winner.playerId,
+      name: winner.name,
+      avatar: winner.avatar,
+      hand: winner.hand
     },
-    winningCard: winningCard,
+    winningCard: room.winningCard,
+    winnerBoard: room.slapOrder,
     durationMs: room.endedAt - (room.startedAt || room.endedAt)
   }));
 }
@@ -492,11 +707,15 @@ function passCardInRoom(room, playerId, cardId) {
 
   console.log(`[PASS] ${currentTurnPlayer.name} passed ${passedCard.name} to ${receiver.name}`);
 
-  // Winner check after receiving
-  const winningCard = checkWinner(receiver.hand);
-  if (winningCard) {
-    endRoomGame(room, receiver, winningCard);
-    return { success: true, winner: receiver };
+  // Check if passer (by passing odd card) or receiver (by getting 4th card) completed 4-of-a-kind
+  const passerWin = checkWinner(currentTurnPlayer.hand);
+  const receiverWin = checkWinner(receiver.hand);
+
+  // If a Bot gets 4 of a kind, bot will slap the center pile!
+  if (passerWin && currentTurnPlayer.isBot) {
+    scheduleBotSlap(room, currentTurnPlayer, passerWin);
+  } else if (receiverWin && receiver.isBot) {
+    scheduleBotSlap(room, receiver, receiverWin);
   }
 
   room.turn = nextIndex;
@@ -546,8 +765,8 @@ function scheduleTurnTimer(room) {
   room.botTimers = [];
 
   if (current.isBot) {
-    // Bot thinks for 0.9s to 1.4s
-    const delay = 900 + Math.random() * 500;
+    // Bot thinks for 0.8s to 1.3s
+    const delay = 800 + Math.random() * 500;
     console.log(`[BOT] ${current.name} is thinking for ${(delay / 1000).toFixed(1)}s...`);
 
     const timer = setTimeout(() => {
@@ -557,7 +776,8 @@ function scheduleTurnTimer(room) {
 
       const winCard = checkWinner(current.hand);
       if (winCard) {
-        endRoomGame(room, current, winCard);
+        // Bot slaps pile instead of passing away a winning set
+        scheduleBotSlap(room, current, winCard);
         return;
       }
 
@@ -578,19 +798,25 @@ function scheduleTurnTimer(room) {
   }
 }
 
-// Helper to add bots to a room
+// Helper to add bots to a room with 10 varied cyberpunk bot personalities
+const BOT_POOL = [
+  { name: 'Shadow Ninja', avatar: 'ninja' },
+  { name: 'Neon Cat', avatar: 'cat' },
+  { name: 'Cyber Fox', avatar: 'fox' },
+  { name: 'Astro Kid', avatar: 'astro' },
+  { name: 'Pixel Bot', avatar: 'bot' },
+  { name: 'Quantum Wolf', avatar: 'wolf' },
+  { name: 'Turbo Viper', avatar: 'viper' },
+  { name: 'Robo Panda', avatar: 'panda' },
+  { name: 'Cosmo Bear', avatar: 'bear' },
+  { name: 'Cyber Punk', avatar: 'punk' }
+];
+
 function addBotToRoom(room) {
   if (!room || room.status !== 'waiting' || room.players.length >= room.maxPlayers) return null;
 
-  const botPool = [
-    { name: 'Astro Kid', avatar: 'astro' },
-    { name: 'Cyber Fox', avatar: 'fox' },
-    { name: 'Pixel Bot', avatar: 'bot' },
-    { name: 'Neon Cat', avatar: 'cat' }
-  ];
-
   const usedNames = new Set(room.players.map(p => p.name));
-  const available = botPool.filter(b => !usedNames.has(b.name));
+  const available = BOT_POOL.filter(b => !usedNames.has(b.name));
   const chosen = available.length > 0 ? available[0] : { name: `Bot_${room.players.length + 1}`, avatar: 'bot' };
 
   const botPlayer = {
@@ -744,10 +970,11 @@ function handleClientWsMessage(socket, msg) {
   const { action, roomId, playerId, data } = msg;
 
   if (action === 'quick_play') {
-    // Instant Solo/Bot Matchmaking: Create room, add player + 3 bots, start instantly!
+    // Instant Solo/Bot Matchmaking: Create room, add player + AI bots (default 6 players)
+    const targetCount = Math.min(Math.max(Number(data?.playerCount) || 6, 3), 8);
     const room = createRoom({
       name: `Arena #${Math.floor(1000 + Math.random() * 9000)}`,
-      maxPlayers: 4,
+      maxPlayers: targetCount,
       category: data?.category || 'Fruits'
     });
 
@@ -765,10 +992,10 @@ function handleClientWsMessage(socket, msg) {
     };
     room.players.push(humanPlayer);
 
-    // Add 3 AI Bots
-    addBotToRoom(room);
-    addBotToRoom(room);
-    addBotToRoom(room);
+    // Add bots up to room capacity (e.g. 5 bots for 6 players)
+    while (room.players.length < room.maxPlayers) {
+      addBotToRoom(room);
+    }
 
     // Confirm joined
     sendWsFrame(socket, JSON.stringify({
@@ -858,6 +1085,11 @@ function handleClientWsMessage(socket, msg) {
     const room = rooms.get(roomId);
     if (room) {
       passCardInRoom(room, playerId, data.cardId);
+    }
+  } else if (action === 'slap_pile') {
+    const room = rooms.get(roomId);
+    if (room) {
+      handleSlapPile(room, playerId);
     }
   } else if (action === 'send_reaction') {
     const room = rooms.get(roomId);

@@ -241,6 +241,24 @@
 
       <!-- PRIMARY ACTION HUB -->
       <section class="flex flex-col gap-2.5">
+        <!-- ARENA SIZE SELECTOR (4, 6, 8 Players) -->
+        <div class="glass-panel p-2 flex items-center justify-between border border-white/10">
+          <span class="text-[10px] font-bold text-muted uppercase tracking-wider pl-1.5 flex items-center gap-1">
+            <span class="material-symbols-outlined text-xs text-primary-neon">groups</span> Players:
+          </span>
+          <div class="flex items-center gap-1">
+            <button id="countBtn4" class="player-count-btn px-2.5 py-1 rounded-lg text-[10px] font-bold bg-surface-lowest text-muted border border-white/10 transition-all cursor-pointer" onclick="window.setApp.setPlayerCount(4)">
+              4 Players
+            </button>
+            <button id="countBtn6" class="player-count-btn active-count-btn px-2.5 py-1 rounded-lg text-[10px] font-bold bg-primary-neon text-surface-lowest transition-all cursor-pointer glow-cyan-sm" onclick="window.setApp.setPlayerCount(6)">
+              6 Players ⭐
+            </button>
+            <button id="countBtn8" class="player-count-btn px-2.5 py-1 rounded-lg text-[10px] font-bold bg-surface-lowest text-muted border border-white/10 transition-all cursor-pointer" onclick="window.setApp.setPlayerCount(8)">
+              8 Players ⚔️
+            </button>
+          </div>
+        </div>
+
         <!-- HERO QUICK PLAY BUTTON -->
         <button id="quickPlayBtn" class="group w-full h-16 rounded-2xl p-0.5 btn-primary glow-cyan transition-all active:scale-[0.98] cursor-pointer"
                 onclick="window.setApp.triggerQuickPlay()">
@@ -250,9 +268,9 @@
                 <span class="material-symbols-outlined text-2xl font-black">bolt</span>
               </div>
               <div class="text-left">
-                <span class="block font-outfit font-black text-lg text-surface-lowest leading-tight">PLAY VS 3 BOTS</span>
+                <span id="quickPlayBtnText" class="block font-outfit font-black text-lg text-surface-lowest leading-tight">PLAY VS 5 BOTS (6P)</span>
                 <span class="text-[10px] text-primary-dark font-bold flex items-center gap-1">
-                  <span class="material-symbols-outlined text-xs">smart_toy</span> Solo Practice Match • Real AI
+                  <span class="material-symbols-outlined text-xs">smart_toy</span> Solo Arena • Slap Pile Showdown
                 </span>
               </div>
             </div>
@@ -403,14 +421,25 @@
           </div>
 
           <!-- Central Holographic SET! Slap Pile -->
-          <div class="relative w-28 h-28 flex items-center justify-center z-30">
+          <div class="relative w-32 h-32 flex items-center justify-center z-30">
+            <!-- Pulsing Emergency Frenzy Ring -->
+            <div id="slapFrenzyRing" class="hidden absolute inset-0 rounded-full border-4 border-red-500 animate-ping pointer-events-none"></div>
+
             <button id="centerSlapPileBtn" 
-                    class="relative w-24 h-24 rounded-full bg-surface-high/90 border-2 border-white/20 hover:border-primary-neon transition-all flex flex-col items-center justify-center shadow-2xl active:scale-90 cursor-pointer"
+                    class="relative w-26 h-26 rounded-full bg-surface-high/90 border-2 border-white/20 hover:border-primary-neon transition-all flex flex-col items-center justify-center shadow-2xl active:scale-90 cursor-pointer"
                     onclick="window.setApp.slapCenterPile()">
-              <span class="material-symbols-outlined text-2xl text-primary-neon">pan_tool</span>
-              <span class="font-outfit font-black text-sm text-on-surface tracking-widest mt-0.5">SET!</span>
-              <span class="text-[8px] font-bold text-muted uppercase">SLAP PILE</span>
+              <div id="slapStatusTag" class="hidden absolute -top-3.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-red-600 text-white shadow-lg animate-bounce">
+                🚨 SLAP NOW!
+              </div>
+              <span id="slapPileIcon" class="material-symbols-outlined text-2xl text-primary-neon">pan_tool</span>
+              <span id="slapPileText" class="font-outfit font-black text-sm text-on-surface tracking-widest mt-0.5">SET!</span>
+              <span id="slapPileSubtext" class="text-[8px] font-bold text-muted uppercase">SLAP PILE</span>
             </button>
+
+            <!-- Live Slap Counter Badge -->
+            <div id="slapCounterBadge" class="hidden absolute -bottom-3 px-2.5 py-0.5 rounded-full bg-surface-lowest border border-primary-neon text-[9px] font-mono font-bold text-primary-neon shadow">
+              <span id="slappedCountText">0/6</span> Slapped
+            </div>
           </div>
         </div>
       </section>
@@ -630,60 +659,78 @@
     </div>
   </div>
 
-  <!-- 5. VICTORY CELEBRATION MODAL -->
-  <div id="victoryModal" class="app-modal fixed inset-0 z-50 bg-black/90 backdrop-blur-lg flex items-center justify-center p-4 hidden">
-    <div class="glass-panel-heavy w-full max-w-sm p-6 flex flex-col items-center text-center shadow-2xl relative border-2 border-primary-neon glow-cyan">
+  <!-- 5. WINNER BOARD & LEADERBOARD MODAL -->
+  <div id="victoryModal" class="app-modal fixed inset-0 z-50 bg-black/90 backdrop-blur-lg flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="glass-panel-heavy w-full max-w-sm p-4 sm:p-5 flex flex-col items-center text-center shadow-2xl relative border-2 border-primary-neon glow-cyan max-h-[92vh] overflow-y-auto no-scrollbar">
       
       <!-- Top Neon Header -->
-      <div class="px-3 py-1 rounded-full bg-secondary-neon/20 border border-secondary-neon text-secondary-neon text-[10px] font-bold uppercase tracking-wider mb-2">
-        MATCH OVER
+      <div class="px-3 py-0.5 rounded-full bg-secondary-neon/20 border border-secondary-neon text-secondary-neon text-[10px] font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1">
+        <span>🏆</span>
+        <span>ARENA LEADERBOARD</span>
       </div>
 
-      <h1 class="font-outfit font-black text-3xl text-primary-neon text-glow uppercase tracking-wider">
-        SET! WINNER!
+      <h1 class="font-outfit font-black text-2xl sm:text-3xl text-primary-neon text-glow uppercase tracking-wider">
+        SET! SLAP SHOWDOWN
       </h1>
 
-      <p id="victoryWinnerName" class="font-outfit font-extrabold text-xl text-on-surface mt-1">
-        YOU WON!
-      </p>
       <p id="victorySubtext" class="text-xs text-muted mb-2">
-        You collected 4-of-a-Kind first!
+        Leaderboard sorted by slap reaction speed!
       </p>
 
       <!-- Streak Banner in Modal -->
-      <div id="victoryStreakBanner" class="mb-4 px-3 py-1.5 rounded-xl bg-surface-high border border-white/10 flex items-center justify-center gap-2">
+      <div id="victoryStreakBanner" class="mb-3 px-3 py-1 rounded-xl bg-surface-high border border-white/10 flex items-center justify-center gap-2">
         <span class="text-base">🔥</span>
         <span id="victoryStreakText" class="text-xs font-bold text-primary-neon">Current Streak: 0</span>
       </div>
 
-      <!-- Winner Avatar Spotlight -->
-      <div class="relative w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-primary-neon via-secondary-neon to-tertiary-neon shadow-2xl glow-cyan mb-4 flex items-center justify-center">
-        <div id="victoryAvatarIcon" class="w-full h-full rounded-full bg-surface-lowest flex items-center justify-center text-4xl">
-          🦊
+      <!-- 🥇 1ST PLACE WINNER SPOTLIGHT -->
+      <div class="w-full p-3 rounded-2xl bg-gradient-to-b from-yellow-500/15 to-surface-high/60 border border-yellow-400/40 mb-3 flex flex-col items-center shadow-lg">
+        <div class="relative w-16 h-16 rounded-full p-1 bg-gradient-to-tr from-yellow-400 via-primary-neon to-yellow-200 shadow-xl glow-cyan-sm mb-2 flex items-center justify-center">
+          <div id="victoryAvatarIcon" class="w-full h-full rounded-full bg-surface-lowest flex items-center justify-center text-3xl">
+            🦊
+          </div>
+          <div class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-yellow-400 text-surface-lowest flex items-center justify-center font-bold text-xs shadow">
+            👑
+          </div>
         </div>
-        <div class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-primary-neon text-surface-lowest flex items-center justify-center font-bold text-xs shadow">
-          👑
+        <div class="flex items-center gap-1.5">
+          <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-400/20 text-yellow-300 font-black">🥇 1ST PLACE</span>
+          <span id="victoryWinnerName" class="font-outfit font-black text-base text-on-surface">YOU WON!</span>
+        </div>
+        <span class="text-[10px] text-yellow-200/80 font-mono mt-0.5">SET Caller • 4-of-a-Kind Champion</span>
+
+        <!-- Winning 4 Cards Row -->
+        <div class="w-full mt-2.5">
+          <div id="winningCardsRow" class="flex justify-center gap-1.5">
+            <!-- Populated by JS -->
+          </div>
         </div>
       </div>
 
-      <!-- Winning 4 Cards Row -->
-      <div class="w-full mb-5">
-        <p class="text-[10px] font-bold text-muted uppercase tracking-wider mb-2">Winning 4-of-a-Kind Hand</p>
-        <div id="winningCardsRow" class="flex justify-center gap-2">
-          <!-- Populated by JS -->
+      <!-- FULL WINNER BOARD / STANDINGS -->
+      <div class="w-full mb-3 text-left">
+        <div class="flex items-center justify-between mb-1.5 px-1">
+          <span class="text-[10px] font-bold text-muted uppercase tracking-wider">Slap Rankings (2nd, 3rd, 4th...)</span>
+          <span class="text-[9px] font-mono text-primary-neon">Reaction Speed</span>
+        </div>
+        <div id="winnerBoardStandingsList" class="flex flex-col gap-1.5 w-full">
+          <!-- Populated by JS with 1st, 2nd, 3rd, 4th... -->
         </div>
       </div>
 
       <!-- Dual Actions -->
-      <div class="w-full flex flex-col gap-2">
-        <button class="w-full py-3.5 btn-primary text-xs font-black rounded-xl glow-cyan cursor-pointer" onclick="window.setApp.playAgain()">
-          <span class="material-symbols-outlined text-lg">bolt</span>
-          <span>PLAY AGAIN</span>
+      <div class="w-full flex flex-col gap-2 mt-1">
+        <button class="w-full py-3 btn-primary text-xs font-black rounded-xl glow-cyan cursor-pointer flex items-center justify-center gap-1.5" onclick="window.setApp.playAgain()">
+          <span class="material-symbols-outlined text-base">replay</span>
+          <span>PLAY NEXT ROUND</span>
         </button>
-        <button class="w-full py-2.5 btn-secondary text-xs font-bold rounded-xl cursor-pointer" onclick="window.setApp.returnToLobby()">
+        <button class="w-full py-2 btn-secondary text-xs font-bold rounded-xl cursor-pointer" onclick="window.setApp.returnToLobby()">
           <span>RETURN TO LOBBY</span>
         </button>
       </div>
+
+    </div>
+  </div>
 
     </div>
   </div>

@@ -64,10 +64,14 @@ The terminal will display:
    - Collect **4 cards of the same item** (e.g. 4x Strawberries, 4x Teslas, 4x Lions).
 2. **Passing Cards**:
    - Each player begins with 4 cards.
-   - On your turn, tap the odd card in your hand and tap **"PASS SELECTED CARD"** to pass it clockwise.
-3. **Calling SET! & Winning**:
-   - As soon as you hold 4 matching cards, SLAP the glowing center pile!
-   - The game triggers a victory celebration with confetti, winner spotlight, and scoreboard.
+   - On your turn, tap the odd card in your hand and tap **"PASS SELECTED CARD"** (or double-tap the card) to pass it clockwise.
+3. **Slapping the Pile & Reaction Frenzy**:
+   - As soon as you collect 4-of-a-kind (or pass your final odd card), tap **"SLAP SET PILE!"** to claim **🥇 1st Place (SET Caller)**!
+   - This instantly triggers an emergency **SLAP FRENZY** for all players!
+   - **All other players (humans & AI bots) must immediately SLAP the center pile** to claim **🥈 2nd Place**, **🥉 3rd Place**, **4th Place**, etc.
+   - The slowest player or anyone who fails to slap ends up in **🫏 Last Place (Donkey / Out)**!
+4. **Arena Winner Board**:
+   - Shows the complete standings podium with reaction times, winning hand showcase, and win streaks.
 
 ---
 
