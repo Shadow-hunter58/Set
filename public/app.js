@@ -591,6 +591,23 @@
     `).join('');
   }
 
+  function getMyPlayer() {
+    const room = state.activeRoom;
+    if (!room || !room.players) return null;
+    if (state.isPassAndPlay) {
+      return room.players[room.turn] || room.players[0];
+    }
+    let p = room.players.find(x => x.id === state.playerId);
+    if (!p) {
+      p = room.players.find(x => !x.isBot) || room.players[0];
+      if (p && p.id && !p.isBot && p.id !== state.playerId) {
+        state.playerId = p.id;
+        try { localStorage.setItem('set_player_id', p.id); } catch (e) {}
+      }
+    }
+    return p;
+  }
+
   function renderActiveRoom() {
     const room = state.activeRoom;
     if (!room) return;
@@ -606,9 +623,7 @@
       // Turn indicator & Active Player resolution
       const isPassAndPlay = Boolean(state.isPassAndPlay);
       const currentTurnPlayer = room.players ? room.players[room.turn] : null;
-      const myPlayer = isPassAndPlay
-        ? currentTurnPlayer
-        : (room.players ? (room.players.find(p => p.id === state.playerId) || room.players.find(p => !p.isBot) || room.players[0]) : null);
+      const myPlayer = getMyPlayer();
       const isMyTurn = isPassAndPlay ? true : (currentTurnPlayer?.id === myPlayer?.id);
       const currentTurnName = isPassAndPlay ? (currentTurnPlayer?.name || 'Current Player') : (currentTurnPlayer?.name || 'Player');
       const isTurnBot = isPassAndPlay ? false : (currentTurnPlayer?.isBot || false);
@@ -852,7 +867,7 @@
     const btn = document.getElementById('passCardButton');
     if (!btn) return;
 
-    const myPlayer = state.activeRoom?.players.find(p => p.id === state.playerId);
+    const myPlayer = getMyPlayer();
     const counts = {};
     (myPlayer?.hand || []).forEach(c => { counts[c.name] = (counts[c.name] || 0) + 1; });
     const hasFourMatching = Object.values(counts).some(cnt => cnt >= 4);
@@ -969,8 +984,10 @@
   function passSelectedCard() {
     if (!state.activeRoom) return;
 
-    const myPlayer = state.activeRoom.players?.find(p => p.id === state.playerId);
-    if (!state.selectedCardId && myPlayer?.hand && myPlayer.hand.length > 0) {
+    const myPlayer = getMyPlayer();
+    if (!myPlayer) return;
+
+    if (!state.selectedCardId && myPlayer.hand && myPlayer.hand.length > 0) {
       // Auto-select odd card if user didn't manually click a specific card
       const counts = {};
       myPlayer.hand.forEach(c => { counts[c.name] = (counts[c.name] || 0) + 1; });
@@ -1110,7 +1127,7 @@
     vibrate([80, 40, 80]);
 
     if (!state.activeRoom) return;
-    const myPlayer = state.activeRoom.players.find(p => p.id === state.playerId);
+    const myPlayer = getMyPlayer();
     if (!myPlayer) return;
 
     // Case 1: Slap Frenzy is currently active! (Rivals are rushing to slap for 2nd, 3rd, 4th place)

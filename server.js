@@ -574,7 +574,14 @@ function handleSlapPile(room, playerId) {
     return { error: 'Game not active' };
   }
 
-  const player = room.players.find(p => p.id === playerId);
+  let player = room.players.find(p => p.id === playerId);
+  if (!player) {
+    const numHumans = room.players.filter(p => !p.isBot).length;
+    if (numHumans === 1) {
+      player = room.players.find(p => !p.isBot);
+      if (player) player.id = playerId;
+    }
+  }
   if (!player) return { error: 'Player not found' };
 
   if (room.status === 'playing') {
@@ -685,9 +692,17 @@ function endRoomGameWithWinnerBoard(room) {
 function passCardInRoom(room, playerId, cardId) {
   if (room.status !== 'playing') return { error: 'Game not active' };
 
-  const currentTurnPlayer = room.players[room.turn];
-  if (!currentTurnPlayer || currentTurnPlayer.id !== playerId) {
-    return { error: 'Not your turn' };
+  let currentTurnPlayer = room.players[room.turn];
+  if (!currentTurnPlayer) return { error: 'Not your turn' };
+
+  if (currentTurnPlayer.id !== playerId) {
+    const numHumans = room.players.filter(p => !p.isBot).length;
+    if (numHumans === 1 && !currentTurnPlayer.isBot) {
+      currentTurnPlayer.id = playerId;
+    } else {
+      console.log(`[PASS REJECTED] Not player turn: requested by ${playerId}, but current turn is ${currentTurnPlayer.name} (${currentTurnPlayer.id})`);
+      return { error: 'Not your turn' };
+    }
   }
 
   const cardIndex = currentTurnPlayer.hand.findIndex(c => c.id === cardId);
@@ -1021,6 +1036,16 @@ function handleClientWsMessage(socket, msg) {
     room.subscribers.add(socket);
 
     let player = room.players.find(p => p.id === playerId);
+    if (!player && room.status === 'playing') {
+      const existingHuman = room.players.find(p => !p.isBot && (p.name === data?.name || room.players.filter(x => !x.isBot).length === 1));
+      if (existingHuman) {
+        existingHuman.id = playerId;
+        existingHuman.disconnected = false;
+        player = existingHuman;
+        console.log(`[RECONNECT] Reconnected ${player.name} to ongoing match #${room.id}`);
+      }
+    }
+
     if (!player) {
       if (room.status === 'playing') {
         sendWsFrame(socket, JSON.stringify({ event: 'error', data: { message: 'Game already in progress' } }));
