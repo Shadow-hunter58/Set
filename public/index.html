@@ -7,16 +7,44 @@
   <meta name="description" content="SET! - Fast-Paced 4-of-a-Kind Card Passing Multiplayer Game for Android & Mobile Web"/>
   <title>SET! - 4-of-a-Kind Card Passing Battle</title>
 
-  <!-- Force Purge Stale Service Worker Caches -->
+  <!-- PWA & Mobile App Support -->
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" type="image/svg+xml" href="icon.svg"/>
+  <link rel="apple-touch-icon" href="icon-192.png"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="SET!"/>
+
+  <!-- Service Worker Registration for PWA / Mobile Install -->
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(regs => {
-        for (const reg of regs) reg.unregister();
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
       });
     }
-    if ('caches' in window) {
-      caches.keys().then(keys => keys.forEach(key => caches.delete(key)));
-    }
+
+    let deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      const installBtn = document.getElementById('installAppBtn');
+      if (installBtn) installBtn.classList.remove('hidden');
+    });
+
+    window.installPwaApp = async function() {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const choice = await deferredInstallPrompt.userChoice;
+        if (choice.outcome === 'accepted') {
+          const installBtn = document.getElementById('installAppBtn');
+          if (installBtn) installBtn.classList.add('hidden');
+        }
+        deferredInstallPrompt = null;
+      } else {
+        alert('To install on your phone:\n- Android: Tap the 3 dots in Chrome and tap "Install app" or "Add to Home screen"\n- iPhone: Tap the Share button in Safari and tap "Add to Home Screen"');
+      }
+    };
   </script>
 
   <!-- Custom Stylesheet with Cache Busting -->
@@ -98,7 +126,13 @@
       </div>
 
       <!-- Right Multi-Action Controls -->
-      <div class="flex items-center space-x-1">
+      <div class="flex items-center space-x-1.5">
+        <!-- Install App Button -->
+        <button id="installAppBtn" class="px-2.5 py-1 rounded-full bg-primary-neon text-surface-lowest text-[10px] font-black uppercase flex items-center gap-1 glow-cyan-sm active:scale-95 cursor-pointer"
+                onclick="window.installPwaApp()" title="Install App on Device">
+          <span class="material-symbols-outlined text-[14px]">download</span>
+          <span>Install</span>
+        </button>
         <!-- Sound Toggle -->
         <button class="w-8 h-8 rounded-full flex items-center justify-center text-muted hover:text-primary-neon hover:bg-surface-high transition-colors active:scale-90 cursor-pointer" 
                 onclick="window.setApp.toggleSound()" title="Sound On/Off">
