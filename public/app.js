@@ -436,17 +436,29 @@
       const res = await fetch(getApiUrl('/api/ip'));
       if (res.ok) {
         const data = await res.json();
-        state.serverUrl = data.url;
+        const currentOrigin = window.location.origin;
+        const isCurrentOriginValid = currentOrigin && !currentOrigin.startsWith('file:') && !currentOrigin.includes('localhost') && !currentOrigin.includes('127.0.0.1');
+        const activeUrl = isCurrentOriginValid ? currentOrigin : data.url;
+
+        state.serverUrl = activeUrl;
         const qrEl = document.getElementById('qrCodeImage');
         if (qrEl) {
-          qrEl.src = getApiUrl(`/api/qr?url=${encodeURIComponent(data.url)}`);
+          qrEl.src = getApiUrl(`/api/qr?url=${encodeURIComponent(activeUrl)}`);
         }
         const ipDisplay = document.getElementById('serverIpDisplay');
         if (ipDisplay) {
-          ipDisplay.textContent = data.url;
+          ipDisplay.textContent = activeUrl;
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      const currentOrigin = window.location.origin;
+      if (currentOrigin && !currentOrigin.startsWith('file:')) {
+        const ipDisplay = document.getElementById('serverIpDisplay');
+        if (ipDisplay) ipDisplay.textContent = currentOrigin;
+        const qrEl = document.getElementById('qrCodeImage');
+        if (qrEl) qrEl.src = `/api/qr?url=${encodeURIComponent(currentOrigin)}`;
+      }
+    }
   }
 
   // --- SCREEN SWITCHING ---

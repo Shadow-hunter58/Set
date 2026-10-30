@@ -1166,18 +1166,28 @@ const server = http.createServer((req, res) => {
   }
 
   if (pathname === '/api/ip') {
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    const proto = req.headers['x-forwarded-proto'] || (req.socket.encrypted ? 'https' : 'http');
+    const isPublicHost = host && !host.startsWith('localhost') && !host.startsWith('127.0.0.1');
+    const detectedUrl = isPublicHost ? `${proto}://${host}` : `http://${PRIMARY_IP}:${PORT}`;
+
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       primaryIp: PRIMARY_IP,
       port: PORT,
-      url: `http://${PRIMARY_IP}:${PORT}`,
+      url: detectedUrl,
+      isCloud: isPublicHost,
       interfaces: getLocalIpAddresses()
     }));
     return;
   }
 
   if (pathname === '/api/qr') {
-    const targetUrl = urlObj.searchParams.get('url') || `http://${PRIMARY_IP}:${PORT}`;
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    const proto = req.headers['x-forwarded-proto'] || (req.socket.encrypted ? 'https' : 'http');
+    const isPublicHost = host && !host.startsWith('localhost') && !host.startsWith('127.0.0.1');
+    const defaultUrl = isPublicHost ? `${proto}://${host}` : `http://${PRIMARY_IP}:${PORT}`;
+    const targetUrl = urlObj.searchParams.get('url') || defaultUrl;
     const svg = QR.makeQR(targetUrl);
     res.writeHead(200, { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=3600' });
     res.end(svg);
