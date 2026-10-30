@@ -431,33 +431,43 @@
     } catch (e) {}
   }
 
+  function getShareableUrl() {
+    const origin = window.location.origin;
+    if (origin && !origin.startsWith('file:') && !origin.includes('localhost') && !origin.includes('127.0.0.1')) {
+      return origin;
+    }
+    if (state.serverUrl && !state.serverUrl.startsWith('file:') && !state.serverUrl.includes('localhost') && !state.serverUrl.includes('127.0.0.1')) {
+      return state.serverUrl;
+    }
+    return state.serverUrl || origin || 'http://localhost:3000';
+  }
+
   async function fetchServerIpInfo() {
     try {
       const res = await fetch(getApiUrl('/api/ip'));
       if (res.ok) {
         const data = await res.json();
-        const currentOrigin = window.location.origin;
-        const isCurrentOriginValid = currentOrigin && !currentOrigin.startsWith('file:') && !currentOrigin.includes('localhost') && !currentOrigin.includes('127.0.0.1');
-        const activeUrl = isCurrentOriginValid ? currentOrigin : data.url;
+        const activeUrl = getShareableUrl();
+        if (data.url && (activeUrl.includes('localhost') || activeUrl.includes('127.0.0.1'))) {
+          state.serverUrl = data.url;
+        }
 
-        state.serverUrl = activeUrl;
+        const finalUrl = getShareableUrl();
         const qrEl = document.getElementById('qrCodeImage');
         if (qrEl) {
-          qrEl.src = getApiUrl(`/api/qr?url=${encodeURIComponent(activeUrl)}`);
+          qrEl.src = getApiUrl(`/api/qr?url=${encodeURIComponent(finalUrl)}`);
         }
         const ipDisplay = document.getElementById('serverIpDisplay');
         if (ipDisplay) {
-          ipDisplay.textContent = activeUrl;
+          ipDisplay.textContent = finalUrl;
         }
       }
     } catch (e) {
-      const currentOrigin = window.location.origin;
-      if (currentOrigin && !currentOrigin.startsWith('file:')) {
-        const ipDisplay = document.getElementById('serverIpDisplay');
-        if (ipDisplay) ipDisplay.textContent = currentOrigin;
-        const qrEl = document.getElementById('qrCodeImage');
-        if (qrEl) qrEl.src = `/api/qr?url=${encodeURIComponent(currentOrigin)}`;
-      }
+      const finalUrl = getShareableUrl();
+      const ipDisplay = document.getElementById('serverIpDisplay');
+      if (ipDisplay) ipDisplay.textContent = finalUrl;
+      const qrEl = document.getElementById('qrCodeImage');
+      if (qrEl) qrEl.src = `/api/qr?url=${encodeURIComponent(finalUrl)}`;
     }
   }
 
@@ -1480,9 +1490,7 @@
   function openHostModal() {
     const modal = document.getElementById('hostModal');
     if (modal) {
-      const activeUrl = (window.location.origin && !window.location.origin.startsWith('file:') && !window.location.origin.includes('localhost')) 
-        ? window.location.origin 
-        : (state.serverUrl || window.location.origin);
+      const activeUrl = getShareableUrl();
       const ipDisplay = document.getElementById('serverIpDisplay');
       if (ipDisplay) ipDisplay.textContent = activeUrl;
       const qrEl = document.getElementById('qrCodeImage');
@@ -1490,6 +1498,19 @@
 
       fetchServerIpInfo();
       modal.classList.remove('hidden');
+    }
+  }
+
+  function copyServerUrl() {
+    const url = getShareableUrl();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('Link copied to clipboard! Share with friends.', 'success');
+      }).catch(() => {
+        showToast(`URL: ${url}`, 'info');
+      });
+    } else {
+      showToast(`URL: ${url}`, 'info');
     }
   }
 
@@ -2094,6 +2115,7 @@
     triggerQuickPlay,
     openHostModal,
     closeHostModal,
+    copyServerUrl,
     hostNewRoom,
     openJoinModal,
     closeJoinModal,
