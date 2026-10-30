@@ -1480,6 +1480,14 @@
   function openHostModal() {
     const modal = document.getElementById('hostModal');
     if (modal) {
+      const activeUrl = (window.location.origin && !window.location.origin.startsWith('file:') && !window.location.origin.includes('localhost')) 
+        ? window.location.origin 
+        : (state.serverUrl || window.location.origin);
+      const ipDisplay = document.getElementById('serverIpDisplay');
+      if (ipDisplay) ipDisplay.textContent = activeUrl;
+      const qrEl = document.getElementById('qrCodeImage');
+      if (qrEl) qrEl.src = getApiUrl(`/api/qr?url=${encodeURIComponent(activeUrl)}`);
+
       fetchServerIpInfo();
       modal.classList.remove('hidden');
     }

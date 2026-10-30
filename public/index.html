@@ -570,11 +570,11 @@
 
       <!-- Live QR Code -->
       <div class="w-44 h-44 bg-surface-lowest p-2 rounded-2xl border-2 border-primary-neon shadow-lg glow-cyan-sm mb-3 flex items-center justify-center">
-        <img id="qrCodeImage" src="/api/qr" alt="QR Code" class="w-full h-full object-contain rounded-xl"/>
+        <img id="qrCodeImage" src="/api/qr" alt="QR Code" class="w-full h-full object-contain rounded-xl" onerror="this.src='/api/qr?url=' + encodeURIComponent(window.location.origin)"/>
       </div>
 
       <div class="text-[11px] font-mono text-muted mb-3">
-        URL: <span id="serverIpDisplay" class="text-primary-neon font-bold">http://localhost:3000</span>
+        URL: <span id="serverIpDisplay" class="text-primary-neon font-bold">Detecting server address...</span>
       </div>
 
       <!-- Room Name Input -->
