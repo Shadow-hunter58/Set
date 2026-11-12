@@ -1,36 +1,37 @@
 /* ==========================================================================
-   SET! - Natural Earth & Organic Tactile Design System
-   Warm Linen, Deep Forest Sage, Terracotta Clay & Honey Ochre
+   SET! - Tactile Card Slam & Natural Linen Earth-Tone Design System
+   Warm Ceramic Cream, Deep Forest Sage, Terracotta Clay & Golden Honey
    ========================================================================== */
 
 :root {
   /* Warm Natural Surface Palette */
-  --bg-dark: #F4EFEA;
-  --bg-main: #F4EFEA;
-  --surface-lowest: #EDE6DC;
-  --surface-low: #E5DDD1;
-  --surface-container: #FAF7F2;
-  --surface-high: #EAE2D5;
-  --surface-highest: #DDD3C3;
+  --bg-dark: #F5EFEB;
+  --bg-main: #F5EFEB;
+  --surface-lowest: #EDE4DC;
+  --surface-low: #E4D8CE;
+  --surface-container: #FAF6F0;
+  --surface-high: #EAE0D5;
+  --surface-highest: #DCD0C2;
 
-  /* Primary Accent: Deep Forest Sage Green */
+  /* Matcha Green / Forest Sage */
   --primary: #2D5A43;
   --primary-neon: #2D5A43;
   --primary-dark: #1E3D2D;
-  --primary-light: #E8F0EB;
+  --primary-light: #EBF2EC;
   --lime-glow: rgba(45, 90, 67, 0.25);
 
-  /* Secondary Accent: Terracotta & Warm Burnt Clay */
+  /* Terracotta Clay & Coral Amber */
   --secondary: #C85A32;
   --secondary-neon: #C85A32;
-  --secondary-dark: #A54320;
+  --secondary-dark: #9E3F1C;
   --secondary-light: #FBF0EB;
+  --accent-coral: #F38C68;
   --cobalt: #C85A32;
   --cobalt-electric: #D96B43;
   --cobalt-deep: #A54320;
   --cobalt-glow: rgba(200, 90, 50, 0.25);
 
-  /* Tertiary Accent: Warm Honey Ochre & Amber */
+  /* Warm Honey Ochre & Star Amber */
   --tertiary: #D99B26;
   --tertiary-neon: #D99B26;
   --tertiary-light: #FDF6E8;
@@ -42,9 +43,9 @@
 
   /* Tactile Physical Playing Cards */
   --card-bg: #FFFFFF;
-  --card-border: #D8CEBE;
-  --card-shadow: 0 4px 14px rgba(60, 50, 40, 0.08), 0 1px 3px rgba(60, 50, 40, 0.04);
-  --card-hover-shadow: 0 8px 22px rgba(60, 50, 40, 0.12), 0 2px 6px rgba(60, 50, 40, 0.06);
+  --card-border: #E4D9CC;
+  --card-bevel: #D2C4B2;
+  --card-shadow: 0 4px 0 #D2C4B2, 0 8px 18px rgba(70, 55, 40, 0.08), inset 0 2px 0 rgba(255, 255, 255, 0.9);
 
   /* Borders & Glass */
   --border-glass: rgba(70, 55, 40, 0.12);
@@ -84,7 +85,7 @@ body {
   flex-direction: column;
 }
 
-/* Natural Ambient Gradients: Soft Sunlight, Sage Leaf & Clay */
+/* Natural Ambient Gradients: Warm Sunlight & Sage Mist */
 .cyber-bg {
   position: fixed;
   inset: 0;
@@ -101,7 +102,7 @@ body {
   width: 380px;
   height: 380px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(235, 205, 140, 0.28) 0%, rgba(220, 190, 130, 0.12) 50%, transparent 75%);
+  background: radial-gradient(circle, rgba(240, 215, 150, 0.3) 0%, rgba(225, 200, 140, 0.12) 50%, transparent 75%);
   filter: blur(60px);
 }
 
@@ -112,7 +113,7 @@ body {
   width: 320px;
   height: 320px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(160, 195, 175, 0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(165, 205, 180, 0.25) 0%, transparent 70%);
   filter: blur(65px);
 }
 
@@ -123,27 +124,27 @@ body {
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(225, 160, 130, 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(245, 175, 145, 0.22) 0%, transparent 70%);
   filter: blur(65px);
 }
 
-/* Tactile Panels (Warm Linen Glass) */
+/* Tactile Panels (Cozy Wooden Tray Glass) */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--border-glass);
-  border-radius: 16px;
+  border: 1.5px solid var(--border-glass);
+  border-radius: 18px;
   box-shadow: 0 4px 16px rgba(60, 50, 40, 0.05);
 }
 
 .glass-panel-heavy {
-  background: rgba(250, 247, 242, 0.96);
+  background: rgba(250, 246, 240, 0.97);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(70, 55, 40, 0.16);
-  border-radius: 20px;
-  box-shadow: 0 12px 36px rgba(60, 50, 40, 0.16), 0 2px 8px rgba(60, 50, 40, 0.06);
+  border: 2px solid rgba(70, 55, 40, 0.15);
+  border-radius: 22px;
+  box-shadow: 0 14px 40px rgba(60, 50, 40, 0.18), 0 2px 8px rgba(60, 50, 40, 0.06);
 }
 
 /* Subtle Soft Shadows replacing neon harshness */
@@ -171,38 +172,39 @@ body {
   text-shadow: none;
 }
 
-/* Primary Natural Button: Deep Forest Sage */
+/* Primary Chunky Tactile Button */
 .btn-primary {
-  background: linear-gradient(135deg, #2D5A43 0%, #224634 100%);
+  background: linear-gradient(135deg, #2D5A43 0%, #1E3D2D 100%);
   color: #FFFFFF !important;
   font-family: 'Outfit', sans-serif;
   font-weight: 800;
   border: none;
-  border-radius: 14px;
+  border-radius: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
-  box-shadow: 0 4px 16px rgba(45, 90, 67, 0.32), 0 2px 4px rgba(45, 90, 67, 0.15);
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s;
+  box-shadow: 0 4px 0 #162C20, 0 6px 16px rgba(45, 90, 67, 0.35);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #35694E 0%, #28523D 100%);
-  box-shadow: 0 6px 20px rgba(45, 90, 67, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #162C20, 0 10px 22px rgba(45, 90, 67, 0.42);
 }
 
 .btn-primary:active {
-  transform: scale(0.97);
+  transform: translateY(3px) scale(0.98);
+  box-shadow: 0 1px 0 #162C20, 0 3px 8px rgba(45, 90, 67, 0.25);
 }
 
-/* Secondary Button: Warm Sand & Stone */
+/* Secondary Button: Chunky Wooden Biscuit */
 .btn-secondary {
   background: var(--surface-high);
   color: var(--text-main);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
+  border: 1.5px solid var(--card-border);
+  border-radius: 14px;
   font-family: 'Outfit', sans-serif;
   font-weight: 700;
   cursor: pointer;
@@ -210,26 +212,30 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  transition: all 0.15s;
-  box-shadow: 0 2px 6px rgba(60, 50, 40, 0.05);
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 3px 0 var(--card-bevel), 0 4px 10px rgba(60, 50, 40, 0.06);
 }
 
 .btn-secondary:hover {
   background: var(--surface-low);
   border-color: var(--primary);
   color: var(--primary);
+  transform: translateY(-2px);
 }
 
 .btn-secondary:active {
-  transform: scale(0.96);
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 0 1px 0 var(--card-bevel);
 }
 
-/* Tactile Playing Card Component (Ivory Linen with Stone Borders) */
+/* ==========================================================================
+   CHUNKY TACTILE CARD TILE COMPONENT (Weighted Physics & Beveled Depth)
+   ========================================================================== */
 .game-card {
-  height: 124px;
-  border-radius: 14px;
+  height: 136px;
+  border-radius: 20px;
   background: #FFFFFF;
-  border: 1px solid var(--card-border);
+  border: 2px solid var(--card-border);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -237,73 +243,179 @@ body {
   padding: 8px 6px;
   cursor: pointer;
   position: relative;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, box-shadow 0.2s;
   user-select: none;
   box-shadow: var(--card-shadow);
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s;
 }
 
 .game-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--card-hover-shadow);
-  border-color: rgba(45, 90, 67, 0.4);
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 8px 0 var(--card-bevel), 0 14px 26px rgba(70, 55, 40, 0.12);
+  border-color: rgba(45, 90, 67, 0.45);
 }
 
-/* Selected Card to Pass */
+.game-card:active {
+  transform: translateY(3px) scale(0.95);
+  box-shadow: 0 1px 0 var(--card-bevel), 0 3px 8px rgba(70, 55, 40, 0.1);
+}
+
+/* Selected Card To Pass */
 .game-card.selected-pass {
-  transform: translateY(-12px);
-  border: 2px solid var(--secondary);
-  box-shadow: 0 10px 24px rgba(200, 90, 50, 0.28), 0 2px 6px rgba(200, 90, 50, 0.15);
+  transform: translateY(-16px) scale(1.04);
+  border: 2.5px solid var(--secondary);
   background: #FFFDF9;
+  box-shadow: 0 8px 0 var(--secondary-dark), 0 16px 30px rgba(200, 90, 50, 0.32), inset 0 2px 0 rgba(255, 255, 255, 0.95);
 }
 
 .game-card.is-matching {
-  border-color: rgba(45, 90, 67, 0.6);
+  border-color: var(--primary);
   background: #F8FAF8;
+}
+
+.game-card.is-triple {
+  border-color: var(--tertiary);
+  background: #FFFAF0;
+  animation: gold-pulse 1.8s infinite ease-in-out;
+}
+
+@keyframes gold-pulse {
+  0%, 100% { box-shadow: 0 4px 0 var(--card-bevel), 0 0 12px rgba(217, 155, 38, 0.4); }
+  50% { box-shadow: 0 4px 0 var(--card-bevel), 0 0 22px rgba(217, 155, 38, 0.7); }
+}
+
+.game-card-icon-well {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #F7F3EC;
+  border: 1px solid rgba(70, 55, 40, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 4px rgba(60, 50, 40, 0.06);
+  margin: auto 0;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.game-card:hover .game-card-icon-well {
+  transform: scale(1.08);
 }
 
 .game-card-icon {
   font-size: 32px;
-  filter: drop-shadow(0 2px 6px rgba(60, 50, 40, 0.12));
-  margin: auto 0;
+  filter: drop-shadow(0 2px 5px rgba(60, 50, 40, 0.15));
 }
 
-.game-card.selected-pass .game-card-icon {
+.game-card.selected-pass .game-card-icon-well {
   animation: card-bounce 0.8s infinite ease-in-out;
 }
 
 @keyframes card-bounce {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); }
+  50% { transform: scale(1.18); }
 }
 
-/* Center Slap Button: Tactile Terracotta Clay Wax Seal */
+/* ==========================================================================
+   TACTILE "SET!" SLAP PILE TARGET (Wax Seal & Weighted Slam Target)
+   ========================================================================== */
 #centerSlapPileBtn {
-  background: linear-gradient(135deg, #C85A32 0%, #B24B25 100%) !important;
-  border: 3px solid #FAF7F2 !important;
+  width: 108px !important;
+  height: 108px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle at 35% 28%, #D86338 0%, #B84720 55%, #8C3110 100%) !important;
+  border: 4px solid #FAF6F0 !important;
+  box-shadow: 0 8px 0 #6B2309, 0 16px 28px rgba(107, 35, 9, 0.35), inset 0 3px 2px rgba(255, 255, 255, 0.35) !important;
   color: #FFFFFF !important;
-  box-shadow: 0 8px 26px rgba(200, 90, 50, 0.4), 0 2px 6px rgba(200, 90, 50, 0.2) !important;
-  transition: transform 0.15s, box-shadow 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s;
+  user-select: none;
 }
 
-#centerSlapPileBtn span.material-symbols-outlined {
+#centerSlapPileBtn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 10px 0 #6B2309, 0 20px 34px rgba(107, 35, 9, 0.45) !important;
+}
+
+#centerSlapPileBtn:active {
+  transform: translateY(5px) scale(0.92);
+  box-shadow: 0 2px 0 #6B2309, 0 4px 10px rgba(107, 35, 9, 0.3) !important;
+}
+
+#centerSlapPileBtn .slap-hand-icon {
+  font-size: 32px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
   color: #FFFFFF !important;
 }
 
 #centerSlapPileBtn span.font-outfit {
   color: #FFFFFF !important;
+  font-size: 17px !important;
+  letter-spacing: 0.15em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 #centerSlapPileBtn span.uppercase {
-  color: #FBD7CC !important;
+  color: #FCE8E2 !important;
+  font-size: 8px !important;
+  letter-spacing: 0.12em;
 }
 
-#centerSlapPileBtn:hover {
-  transform: scale(1.04);
-  box-shadow: 0 10px 30px rgba(200, 90, 50, 0.5) !important;
+/* Pulsing Slap Rush when 4 matching cards ready */
+@keyframes slap-heartbeat {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 14px rgba(200, 90, 50, 0.6)); }
+  15% { transform: scale(1.14); filter: drop-shadow(0 0 26px rgba(200, 90, 50, 0.95)); }
+  30% { transform: scale(1.06); }
+  45% { transform: scale(1.22); filter: drop-shadow(0 0 34px rgba(217, 155, 38, 1)); }
 }
 
-#centerSlapPileBtn:active {
-  transform: scale(0.92);
+.slap-ready-frenzy {
+  animation: slap-heartbeat 0.7s infinite ease-in-out !important;
+}
+
+/* ==========================================================================
+   FLOATING DOPAMINE STICKERS & SPARKS
+   ========================================================================== */
+.praise-sticker {
+  position: absolute;
+  pointer-events: none;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #FAF6F0;
+  border: 2px solid #D99B26;
+  color: #2D5A43;
+  box-shadow: 0 4px 14px rgba(70, 55, 40, 0.16);
+  z-index: 100;
+  animation: sticker-pop 1.5s forwards cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes sticker-pop {
+  0% { transform: translateY(0) scale(0.5); opacity: 0; }
+  20% { transform: translateY(-15px) scale(1.15); opacity: 1; }
+  75% { transform: translateY(-40px) scale(1); opacity: 0.95; }
+  100% { transform: translateY(-65px) scale(0.85); opacity: 0; }
+}
+
+.sparkle-burst {
+  position: absolute;
+  pointer-events: none;
+  font-size: 32px;
+  z-index: 100;
+  animation: sparkle-fade 1.6s forwards cubic-bezier(0.1, 0.8, 0.3, 1);
+}
+
+@keyframes sparkle-fade {
+  0% { transform: scale(0.4) rotate(-15deg); opacity: 0; }
+  25% { transform: scale(1.35) rotate(5deg); opacity: 1; }
+  80% { transform: translateY(-50px) scale(1.1); opacity: 0.8; }
+  100% { transform: translateY(-90px) scale(0.85); opacity: 0; }
 }
 
 /* Animations */
@@ -341,9 +453,9 @@ body {
 /* Confetti particles for victory */
 .confetti-particle {
   position: absolute;
-  width: 9px;
-  height: 9px;
-  border-radius: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
   pointer-events: none;
   animation: confetti-fall 2.5s forwards linear;
 }

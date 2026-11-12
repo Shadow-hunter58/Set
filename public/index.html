@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <meta name="theme-color" content="#FAF7F2"/>
-  <meta name="description" content="SET! - Fast-Paced 4-of-a-Kind Card Passing Multiplayer Game with Natural Earth Tones"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#FAF7F2" />
+  <meta name="description"
+    content="SET! - Fast-Paced 4-of-a-Kind Card Passing Multiplayer Game with Natural Earth Tones" />
   <title>SET! - 4-of-a-Kind Card Passing Game</title>
 
   <!-- Force Purge Stale Service Worker Caches -->
@@ -20,10 +22,13 @@
   </script>
 
   <!-- Google Fonts: Outfit & Plus Jakarta Sans + Material Symbols -->
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
 
   <!-- Tailwind CSS CDN configured for Natural Earth Tone System -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -64,8 +69,9 @@
   </script>
 
   <!-- Custom Natural Design System Stylesheet with Cache Busting -->
-  <link rel="stylesheet" href="style.css?v=6.0"/>
+  <link rel="stylesheet" href="style.css?v=6.0" />
 </head>
+
 <body class="bg-surface-lowest text-on-surface antialiased overflow-x-hidden selection:bg-primary selection:text-white">
 
   <!-- Natural Ambient Gradients (Warm Meadow, Sunlit Sand & Clay) -->
@@ -88,7 +94,8 @@
   <div class="app-container">
 
     <!-- SHARED TOP APP BAR -->
-    <header class="sticky top-0 z-40 flex justify-between items-center px-4 h-16 w-full bg-surface-container/90 backdrop-blur-md border-b border-stone-subtle/50 shadow-sm">
+    <header
+      class="sticky top-0 z-40 flex justify-between items-center px-4 h-16 w-full bg-surface-container/90 backdrop-blur-md border-b border-stone-subtle/50 shadow-sm">
       <!-- Leading Brand Logo -->
       <div class="flex items-center gap-2 cursor-pointer" onclick="window.setApp.returnToLobby()">
         <span class="font-outfit font-black text-2xl tracking-wider text-primary select-none">
@@ -102,17 +109,20 @@
       <!-- Right Multi-Action Controls -->
       <div class="flex items-center space-x-1">
         <!-- Sound Toggle -->
-        <button class="w-8 h-8 rounded-full flex items-center justify-center text-muted hover:text-primary hover:bg-surface-high transition-colors active:scale-90 cursor-pointer" 
-                onclick="window.setApp.toggleSound()" title="Sound On/Off">
+        <button
+          class="w-8 h-8 rounded-full flex items-center justify-center text-muted hover:text-primary hover:bg-surface-high transition-colors active:scale-90 cursor-pointer"
+          onclick="window.setApp.toggleSound()" title="Sound On/Off">
           <span class="material-symbols-outlined text-[20px]" id="soundIcon">volume_up</span>
         </button>
         <!-- Rules Modal Trigger -->
-        <button class="w-8 h-8 rounded-full flex items-center justify-center text-muted hover:text-primary hover:bg-surface-high transition-colors active:scale-90 cursor-pointer"
-                onclick="document.getElementById('rulesModal').classList.remove('hidden')" title="Game Rules">
+        <button
+          class="w-8 h-8 rounded-full flex items-center justify-center text-muted hover:text-primary hover:bg-surface-high transition-colors active:scale-90 cursor-pointer"
+          onclick="document.getElementById('rulesModal').classList.remove('hidden')" title="Game Rules">
           <span class="material-symbols-outlined text-[20px]">help</span>
         </button>
         <!-- Ping Badge -->
-        <div id="pingIndicator" class="px-2.5 py-0.5 rounded-full bg-surface-high border border-stone-subtle/60 flex items-center gap-1.5 text-[11px] font-mono text-muted">
+        <div id="pingIndicator"
+          class="px-2.5 py-0.5 rounded-full bg-surface-high border border-stone-subtle/60 flex items-center gap-1.5 text-[11px] font-mono text-muted">
           <span class="material-symbols-outlined text-[13px] text-primary animate-pulse">bolt</span>
           <span>Online</span>
         </div>
@@ -141,25 +151,30 @@
       </section>
 
       <!-- HERO 4-OF-A-KIND OBJECTIVE VISUALIZER -->
-      <section class="relative w-full rounded-2xl p-4 overflow-hidden glass-panel border border-stone-subtle/60 flex flex-col items-center justify-center text-center shadow-sm">
+      <section
+        class="relative w-full rounded-2xl p-4 overflow-hidden glass-panel border border-stone-subtle/60 flex flex-col items-center justify-center text-center shadow-sm">
         <!-- Floating Visual Cards Fan -->
         <div class="relative w-full h-24 flex items-center justify-center select-none">
-          <div class="absolute w-14 h-20 -rotate-12 -translate-x-12 bg-white rounded-xl p-1.5 border border-stone-subtle shadow-md flex flex-col justify-between items-center">
+          <div
+            class="absolute w-14 h-20 -rotate-12 -translate-x-12 bg-white rounded-xl p-1.5 border border-stone-subtle shadow-md flex flex-col justify-between items-center">
             <span class="text-[10px] font-bold text-primary self-start">🍓</span>
             <span class="text-xl">🍓</span>
             <span class="text-[8px] font-mono text-muted">SET</span>
           </div>
-          <div class="absolute w-14 h-20 -rotate-3 -translate-x-4 bg-white rounded-xl p-1.5 border border-stone-subtle shadow-md flex flex-col justify-between items-center z-10">
+          <div
+            class="absolute w-14 h-20 -rotate-3 -translate-x-4 bg-white rounded-xl p-1.5 border border-stone-subtle shadow-md flex flex-col justify-between items-center z-10">
             <span class="text-[10px] font-bold text-primary self-start">🍓</span>
             <span class="text-xl">🍓</span>
             <span class="text-[8px] font-mono text-muted">SET</span>
           </div>
-          <div class="absolute w-14 h-20 rotate-6 translate-x-4 bg-white rounded-xl p-1.5 border border-stone-subtle shadow-md flex flex-col justify-between items-center z-20">
+          <div
+            class="absolute w-14 h-20 rotate-6 translate-x-4 bg-white rounded-xl p-1.5 border border-stone-subtle shadow-md flex flex-col justify-between items-center z-20">
             <span class="text-[10px] font-bold text-primary self-start">🍓</span>
             <span class="text-xl">🍓</span>
             <span class="text-[8px] font-mono text-muted">SET</span>
           </div>
-          <div class="absolute w-14 h-20 rotate-16 translate-x-12 bg-white rounded-xl p-1.5 border-2 border-primary shadow-xl flex flex-col justify-between items-center z-30 glow-cyan-sm">
+          <div
+            class="absolute w-14 h-20 rotate-16 translate-x-12 bg-white rounded-xl p-1.5 border-2 border-primary shadow-xl flex flex-col justify-between items-center z-30 glow-cyan-sm">
             <span class="text-[10px] font-bold text-primary self-start">🍓</span>
             <span class="text-xl animate-bounce">🍓</span>
             <div class="px-1.5 py-0.5 rounded bg-primary text-white text-[7px] font-black uppercase">
@@ -181,11 +196,13 @@
         <div class="flex items-center justify-between mb-2.5">
           <div class="flex items-center space-x-2">
             <span class="text-xs font-bold text-on-surface tracking-wider uppercase">PLAYER PROFILE</span>
-            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-secondary/15 text-secondary border border-secondary/30">
+            <span
+              class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-secondary/15 text-secondary border border-secondary/30">
               READY
             </span>
           </div>
-          <div id="playerStreakBadge" class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container border border-stone-subtle text-[10px] font-bold text-primary transition-all">
+          <div id="playerStreakBadge"
+            class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container border border-stone-subtle text-[10px] font-bold text-primary transition-all">
             <span>🔥</span>
             <span id="streakCountText">Streak: 0</span>
           </div>
@@ -196,29 +213,41 @@
           <p class="text-[10px] font-bold text-muted uppercase tracking-wider mb-1.5">Choose Avatar</p>
           <div class="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar py-1">
             <!-- Fox -->
-            <button class="avatar-option active-avatar flex flex-col items-center flex-shrink-0 cursor-pointer transition-transform active:scale-95" data-avatar="fox">
-              <div class="w-12 h-12 p-0.5 rounded-2xl bg-white ring-2 ring-primary shadow-md flex items-center justify-center text-2xl border border-primary/20">
+            <button
+              class="avatar-option active-avatar flex flex-col items-center flex-shrink-0 cursor-pointer transition-transform active:scale-95"
+              data-avatar="fox">
+              <div
+                class="w-12 h-12 p-0.5 rounded-2xl bg-white ring-2 ring-primary shadow-md flex items-center justify-center text-2xl border border-primary/20">
                 🦊
               </div>
               <span class="text-[10px] font-bold text-primary mt-1">Fox</span>
             </button>
             <!-- Cat -->
-            <button class="avatar-option opacity-75 hover:opacity-100 flex flex-col items-center flex-shrink-0 cursor-pointer transition-transform active:scale-95" data-avatar="cat">
-              <div class="w-12 h-12 p-0.5 rounded-2xl bg-white border border-stone-subtle shadow-sm flex items-center justify-center text-2xl">
+            <button
+              class="avatar-option opacity-75 hover:opacity-100 flex flex-col items-center flex-shrink-0 cursor-pointer transition-transform active:scale-95"
+              data-avatar="cat">
+              <div
+                class="w-12 h-12 p-0.5 rounded-2xl bg-white border border-stone-subtle shadow-sm flex items-center justify-center text-2xl">
                 🐱
               </div>
               <span class="text-[10px] font-bold text-muted mt-1">Cat</span>
             </button>
             <!-- Bot -->
-            <button class="avatar-option opacity-75 hover:opacity-100 flex flex-col items-center flex-shrink-0 cursor-pointer transition-transform active:scale-95" data-avatar="bot">
-              <div class="w-12 h-12 p-0.5 rounded-2xl bg-white border border-stone-subtle shadow-sm flex items-center justify-center text-2xl">
+            <button
+              class="avatar-option opacity-75 hover:opacity-100 flex flex-col items-center flex-shrink-0 cursor-pointer transition-transform active:scale-95"
+              data-avatar="bot">
+              <div
+                class="w-12 h-12 p-0.5 rounded-2xl bg-white border border-stone-subtle shadow-sm flex items-center justify-center text-2xl">
                 🤖
               </div>
               <span class="text-[10px] font-bold text-muted mt-1">Bot</span>
             </button>
             <!-- Astro -->
-            <button class="avatar-option opacity-75 hover:opacity-100 flex flex-col items-center flex-shrink-0 cursor-pointer transition-transform active:scale-95" data-avatar="astro">
-              <div class="w-12 h-12 p-0.5 rounded-2xl bg-white border border-stone-subtle shadow-sm flex items-center justify-center text-2xl">
+            <button
+              class="avatar-option opacity-75 hover:opacity-100 flex flex-col items-center flex-shrink-0 cursor-pointer transition-transform active:scale-95"
+              data-avatar="astro">
+              <div
+                class="w-12 h-12 p-0.5 rounded-2xl bg-white border border-stone-subtle shadow-sm flex items-center justify-center text-2xl">
                 🧑‍🚀
               </div>
               <span class="text-[10px] font-bold text-muted mt-1">Astro</span>
@@ -231,10 +260,11 @@
           <div class="absolute left-3 flex items-center pointer-events-none text-primary">
             <span class="material-symbols-outlined text-base">badge</span>
           </div>
-          <input id="nicknameInput" type="text" maxlength="16" placeholder="Your Player Nickname" 
-                 class="w-full bg-white border border-stone-subtle focus:border-primary rounded-xl pl-9 pr-20 py-2.5 text-xs font-bold text-on-surface focus:outline-none shadow-sm"/>
-          <button class="absolute right-1.5 px-2 py-1 rounded-lg bg-surface-high text-primary text-[10px] font-bold flex items-center gap-1 active:scale-90 transition-transform cursor-pointer hover:bg-surface-lowest"
-                  onclick="window.setApp.randomizeName()">
+          <input id="nicknameInput" type="text" maxlength="16" placeholder="Your Player Nickname"
+            class="w-full bg-white border border-stone-subtle focus:border-primary rounded-xl pl-9 pr-20 py-2.5 text-xs font-bold text-on-surface focus:outline-none shadow-sm" />
+          <button
+            class="absolute right-1.5 px-2 py-1 rounded-lg bg-surface-high text-primary text-[10px] font-bold flex items-center gap-1 active:scale-90 transition-transform cursor-pointer hover:bg-surface-lowest"
+            onclick="window.setApp.randomizeName()">
             <span>🎲</span>
             <span>Roll</span>
           </button>
@@ -244,11 +274,13 @@
       <!-- PRIMARY ACTION HUB -->
       <section class="flex flex-col gap-2.5">
         <!-- HERO QUICK PLAY BUTTON -->
-        <button id="quickPlayBtn" class="group w-full h-16 rounded-2xl p-0.5 btn-primary transition-all active:scale-[0.98] cursor-pointer"
-                onclick="window.setApp.triggerQuickPlay()">
+        <button id="quickPlayBtn"
+          class="group w-full h-16 rounded-2xl p-0.5 btn-primary transition-all active:scale-[0.98] cursor-pointer"
+          onclick="window.setApp.triggerQuickPlay()">
           <div class="w-full h-full flex items-center justify-between px-5">
             <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white shadow-sm">
+              <div
+                class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white shadow-sm">
                 <span class="material-symbols-outlined text-2xl font-black">bolt</span>
               </div>
               <div class="text-left">
@@ -258,7 +290,8 @@
                 </span>
               </div>
             </div>
-            <div class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white group-hover:translate-x-1 transition-transform">
+            <div
+              class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white group-hover:translate-x-1 transition-transform">
               <span class="material-symbols-outlined text-xl font-bold">arrow_forward</span>
             </div>
           </div>
@@ -267,10 +300,12 @@
         <!-- DUAL MULTIPLAYER ACTION ROW -->
         <div class="grid grid-cols-2 gap-2.5">
           <!-- Host Room (With Phone QR Code) -->
-          <button class="rounded-2xl p-3.5 bg-surface-container border border-secondary/30 hover:border-secondary transition-all text-left flex flex-col justify-between h-28 shadow-sm active:scale-95 cursor-pointer"
-                  onclick="window.setApp.openHostModal()">
+          <button
+            class="rounded-2xl p-3.5 bg-surface-container border border-secondary/30 hover:border-secondary transition-all text-left flex flex-col justify-between h-28 shadow-sm active:scale-95 cursor-pointer"
+            onclick="window.setApp.openHostModal()">
             <div class="flex items-start justify-between w-full">
-              <div class="w-8 h-8 rounded-xl bg-secondary/15 border border-secondary/30 flex items-center justify-center text-secondary">
+              <div
+                class="w-8 h-8 rounded-xl bg-secondary/15 border border-secondary/30 flex items-center justify-center text-secondary">
                 <span class="material-symbols-outlined text-lg">add</span>
               </div>
               <span class="text-[9px] px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-bold">
@@ -284,10 +319,12 @@
           </button>
 
           <!-- Join by Code -->
-          <button class="rounded-2xl p-3.5 bg-surface-container border border-stone-subtle hover:border-primary transition-all text-left flex flex-col justify-between h-28 shadow-sm active:scale-95 cursor-pointer"
-                  onclick="window.setApp.openJoinModal()">
+          <button
+            class="rounded-2xl p-3.5 bg-surface-container border border-stone-subtle hover:border-primary transition-all text-left flex flex-col justify-between h-28 shadow-sm active:scale-95 cursor-pointer"
+            onclick="window.setApp.openJoinModal()">
             <div class="flex items-start justify-between w-full">
-              <div class="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+              <div
+                class="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
                 <span class="material-symbols-outlined text-lg">pin</span>
               </div>
               <span class="text-[9px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">
@@ -302,8 +339,9 @@
         </div>
 
         <!-- Pass & Play Offline Action -->
-        <button class="w-full py-2.5 px-4 rounded-xl bg-surface-container border border-stone-subtle/80 hover:border-primary text-xs font-bold text-on-surface flex items-center justify-between active:scale-98 transition-all cursor-pointer shadow-sm"
-                onclick="window.setApp.startPassAndPlay()">
+        <button
+          class="w-full py-2.5 px-4 rounded-xl bg-surface-container border border-stone-subtle/80 hover:border-primary text-xs font-bold text-on-surface flex items-center justify-between active:scale-98 transition-all cursor-pointer shadow-sm"
+          onclick="window.setApp.startPassAndPlay()">
           <div class="flex items-center gap-2">
             <span class="text-base">🔄</span>
             <span>Pass & Play (Offline on 1 Phone)</span>
@@ -328,7 +366,8 @@
         </div>
 
         <!-- Mini Deck Preview Box -->
-        <div id="deckPreviewBox" class="glass-panel p-2.5 flex items-center justify-between border border-stone-subtle/60 shadow-sm">
+        <div id="deckPreviewBox"
+          class="glass-panel p-2.5 flex items-center justify-between border border-stone-subtle/60 shadow-sm">
           <!-- Populated by JS -->
         </div>
       </section>
@@ -341,7 +380,8 @@
     <main id="gameView" class="hidden relative z-10 w-full min-h-screen flex flex-col justify-between pb-3">
 
       <!-- TOP GAMEPLAY HUD -->
-      <header class="px-3 pt-3 pb-2 bg-surface-container/95 backdrop-blur-md border-b border-stone-subtle/60 flex items-center justify-between gap-2 shadow-sm">
+      <header
+        class="px-3 pt-3 pb-2 bg-surface-container/95 backdrop-blur-md border-b border-stone-subtle/60 flex items-center justify-between gap-2 shadow-sm">
         <!-- Room Code & Round -->
         <div class="flex flex-col gap-0.5 items-start">
           <div class="flex items-center gap-1.5 bg-surface-high px-2 py-0.5 rounded-full border border-stone-subtle">
@@ -362,13 +402,16 @@
 
         <div class="flex items-center gap-1.5">
           <!-- Bot Pilot Toggle -->
-          <button id="autoPilotBtn" class="px-2.5 py-1 rounded-full border border-stone-subtle text-[10px] font-bold flex items-center gap-1 bg-surface-high hover:border-primary transition-all cursor-pointer" onclick="window.setApp.toggleAutoPilot()" title="Toggle Bot Auto-Pilot">
+          <button id="autoPilotBtn"
+            class="px-2.5 py-1 rounded-full border border-stone-subtle text-[10px] font-bold flex items-center gap-1 bg-surface-high hover:border-primary transition-all cursor-pointer"
+            onclick="window.setApp.toggleAutoPilot()" title="Toggle Bot Auto-Pilot">
             <span>🤖</span>
             <span id="autoPilotText" class="text-primary font-mono">Pilot: OFF</span>
           </button>
           <!-- Right: Leave Button -->
-          <button class="w-8 h-8 rounded-full bg-surface-high border border-stone-subtle flex items-center justify-center text-muted hover:text-secondary transition-all active:scale-90 cursor-pointer"
-                  onclick="window.setApp.returnToLobby()" title="Leave Match">
+          <button
+            class="w-8 h-8 rounded-full bg-surface-high border border-stone-subtle flex items-center justify-center text-muted hover:text-secondary transition-all active:scale-90 cursor-pointer"
+            onclick="window.setApp.returnToLobby()" title="Leave Match">
             <span class="material-symbols-outlined text-[18px]">arrow_back</span>
           </button>
         </div>
@@ -379,7 +422,8 @@
 
       <!-- Live Action Banner -->
       <div class="px-3 pt-2">
-        <div id="liveActionTicker" class="w-full max-w-sm mx-auto py-1 px-3 rounded-full bg-surface-container border border-stone-subtle/80 flex items-center justify-center gap-1.5 text-[11px] font-medium text-center shadow-sm">
+        <div id="liveActionTicker"
+          class="w-full max-w-sm mx-auto py-1 px-3 rounded-full bg-surface-container border border-stone-subtle/80 flex items-center justify-center gap-1.5 text-[11px] font-medium text-center shadow-sm">
           <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
           <span id="liveActionTickerText" class="truncate font-semibold text-primary">🎮 Match starting...</span>
         </div>
@@ -390,12 +434,17 @@
         <!-- Table Circles -->
         <div class="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center">
           <!-- Outer Table Mat -->
-          <div class="absolute inset-0 rounded-full border-2 border-stone-subtle/70 shadow-[0_6px_24px_rgba(60,50,40,0.06)] bg-surface-lowest/50"></div>
+          <div
+            class="absolute inset-0 rounded-full border-2 border-stone-subtle/70 shadow-[0_6px_24px_rgba(60,50,40,0.06)] bg-surface-lowest/50">
+          </div>
           <div class="absolute inset-2 rounded-full border border-dashed border-stone-subtle/60 anim-spin-slow"></div>
-          <div class="absolute inset-6 rounded-full bg-surface-container/90 backdrop-blur-sm border border-stone-subtle/60"></div>
+          <div
+            class="absolute inset-6 rounded-full bg-surface-container/90 backdrop-blur-sm border border-stone-subtle/60">
+          </div>
 
           <!-- Direction Badge -->
-          <div id="directionBadge" class="absolute -top-3 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-white border border-stone-subtle flex items-center gap-1 shadow-sm z-20">
+          <div id="directionBadge"
+            class="absolute -top-3 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-white border border-stone-subtle flex items-center gap-1 shadow-sm z-20">
             <!-- Populated by JS -->
           </div>
 
@@ -406,12 +455,12 @@
 
           <!-- Central Tactile SET! Slap Button -->
           <div class="relative w-28 h-28 flex items-center justify-center z-30">
-            <button id="centerSlapPileBtn" 
-                    class="relative w-24 h-24 rounded-full flex flex-col items-center justify-center cursor-pointer"
-                    onclick="window.setApp.slapCenterPile()">
-              <span class="material-symbols-outlined text-2xl">pan_tool</span>
-              <span class="font-outfit font-black text-sm tracking-widest mt-0.5">SET!</span>
-              <span class="text-[8px] font-bold uppercase">SLAP PILE</span>
+            <button id="centerSlapPileBtn"
+              class="relative flex flex-col items-center justify-center cursor-pointer"
+              onclick="window.setApp.slapCenterPile()" title="Slap the center pile when you have a SET!">
+              <span class="material-symbols-outlined text-3xl font-black slap-hand-icon">pan_tool</span>
+              <span class="font-outfit font-black text-base tracking-widest mt-0.5 leading-none">SET!</span>
+              <span class="text-[8px] font-black uppercase tracking-widest mt-1 opacity-90">SLAP PILE</span>
             </button>
           </div>
         </div>
@@ -449,18 +498,25 @@
       </section>
 
       <!-- IN-GAME SOCIAL & EMOJI REACTION DOCK -->
-      <footer class="px-3 py-1.5 bg-surface-container/95 backdrop-blur-md flex items-center justify-between border-t border-stone-subtle/60">
+      <footer
+        class="px-3 py-1.5 bg-surface-container/95 backdrop-blur-md flex items-center justify-between border-t border-stone-subtle/60">
         <!-- Reaction Emoji Bar -->
         <div class="flex items-center gap-2 bg-surface-high px-2.5 py-1 rounded-full border border-stone-subtle">
-          <button class="text-base hover:scale-125 transition-transform active:scale-90 cursor-pointer" onclick="window.setApp.sendReaction('🔥')">🔥</button>
-          <button class="text-base hover:scale-125 transition-transform active:scale-90 cursor-pointer" onclick="window.setApp.sendReaction('😱')">😱</button>
-          <button class="text-base hover:scale-125 transition-transform active:scale-90 cursor-pointer" onclick="window.setApp.sendReaction('💨')">💨</button>
-          <button class="text-base hover:scale-125 transition-transform active:scale-90 cursor-pointer" onclick="window.setApp.sendReaction('👏')">👏</button>
-          <button class="text-base hover:scale-125 transition-transform active:scale-90 cursor-pointer" onclick="window.setApp.sendReaction('🎯')">🎯</button>
+          <button class="text-base hover:scale-125 transition-transform active:scale-90 cursor-pointer"
+            onclick="window.setApp.sendReaction('🔥')">🔥</button>
+          <button class="text-base hover:scale-125 transition-transform active:scale-90 cursor-pointer"
+            onclick="window.setApp.sendReaction('😱')">😱</button>
+          <button class="text-base hover:scale-125 transition-transform active:scale-90 cursor-pointer"
+            onclick="window.setApp.sendReaction('💨')">💨</button>
+          <button class="text-base hover:scale-125 transition-transform active:scale-90 cursor-pointer"
+            onclick="window.setApp.sendReaction('👏')">👏</button>
+          <button class="text-base hover:scale-125 transition-transform active:scale-90 cursor-pointer"
+            onclick="window.setApp.sendReaction('🎯')">🎯</button>
         </div>
         <!-- Quick Chat GG! -->
-        <button class="bg-surface-high px-3 py-1 rounded-full border border-stone-subtle text-on-surface flex items-center gap-1 text-xs font-bold active:scale-90 cursor-pointer hover:border-primary"
-                onclick="window.setApp.sendReaction('GG! 👏')">
+        <button
+          class="bg-surface-high px-3 py-1 rounded-full border border-stone-subtle text-on-surface flex items-center gap-1 text-xs font-bold active:scale-90 cursor-pointer hover:border-primary"
+          onclick="window.setApp.sendReaction('GG! 👏')">
           <span class="material-symbols-outlined text-sm text-secondary">chat_bubble</span>
           <span>GG!</span>
         </button>
@@ -469,16 +525,20 @@
     </main>
 
     <!-- SHARED BOTTOM NAVIGATION (Lobby screen) -->
-    <nav id="bottomNav" class="fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center px-4 py-2 max-w-[440px] mx-auto bg-surface-container/95 backdrop-blur-lg border-t border-stone-subtle/60 shadow-lg">
-      <button class="flex flex-col items-center py-1 px-4 rounded-full bg-primary text-white shadow-sm" onclick="window.setApp.returnToLobby()">
+    <nav id="bottomNav"
+      class="fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center px-4 py-2 max-w-[440px] mx-auto bg-surface-container/95 backdrop-blur-lg border-t border-stone-subtle/60 shadow-lg">
+      <button class="flex flex-col items-center py-1 px-4 rounded-full bg-primary text-white shadow-sm"
+        onclick="window.setApp.returnToLobby()">
         <span class="material-symbols-outlined text-xl">sports_esports</span>
         <span class="text-[10px] font-bold mt-0.5">Lobby</span>
       </button>
-      <button class="flex flex-col items-center py-1 px-4 text-muted hover:text-primary transition-colors" onclick="window.setApp.openCustomDeckModal()">
+      <button class="flex flex-col items-center py-1 px-4 text-muted hover:text-primary transition-colors"
+        onclick="window.setApp.openCustomDeckModal()">
         <span class="material-symbols-outlined text-xl">style</span>
         <span class="text-[10px] font-bold mt-0.5">Decks</span>
       </button>
-      <button class="flex flex-col items-center py-1 px-4 text-muted hover:text-primary transition-colors" onclick="window.setApp.openHostModal()">
+      <button class="flex flex-col items-center py-1 px-4 text-muted hover:text-primary transition-colors"
+        onclick="window.setApp.openHostModal()">
         <span class="material-symbols-outlined text-xl">qr_code_scanner</span>
         <span class="text-[10px] font-bold mt-0.5">QR Connect</span>
       </button>
@@ -491,13 +551,16 @@
   <!-- ========================================== -->
 
   <!-- 1. HOST ROOM MODAL (Includes QR Code for Phones!) -->
-  <div id="hostModal" class="app-modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+  <div id="hostModal"
+    class="app-modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="glass-panel-heavy w-full max-w-sm p-5 flex flex-col items-center text-center shadow-2xl relative">
-      <button class="absolute top-3 right-3 text-muted hover:text-on-surface cursor-pointer" onclick="window.setApp.closeHostModal()">
+      <button class="absolute top-3 right-3 text-muted hover:text-on-surface cursor-pointer"
+        onclick="window.setApp.closeHostModal()">
         <span class="material-symbols-outlined text-xl">close</span>
       </button>
 
-      <div class="w-12 h-12 rounded-full bg-surface-high border border-primary/30 flex items-center justify-center text-primary mb-2 shadow-sm">
+      <div
+        class="w-12 h-12 rounded-full bg-surface-high border border-primary/30 flex items-center justify-center text-primary mb-2 shadow-sm">
         <span class="material-symbols-outlined text-2xl">sensors</span>
       </div>
 
@@ -505,14 +568,18 @@
       <p class="text-xs text-muted mb-3">Scan QR code or share URL with friends to join!</p>
 
       <!-- Live QR Code -->
-      <div class="w-44 h-44 bg-white p-2 rounded-2xl border-2 border-stone-subtle shadow-md mb-3 flex items-center justify-center">
-        <img id="qrCodeImage" src="/api/qr" alt="QR Code" class="w-full h-full object-contain rounded-xl" onerror="this.src='/api/qr?url=' + encodeURIComponent(window.location.origin)"/>
+      <div
+        class="w-44 h-44 bg-white p-2 rounded-2xl border-2 border-stone-subtle shadow-md mb-3 flex items-center justify-center">
+        <img id="qrCodeImage" src="/api/qr" alt="QR Code" class="w-full h-full object-contain rounded-xl"
+          onerror="this.src='/api/qr?url=' + encodeURIComponent(window.location.origin)" />
       </div>
 
       <div class="flex items-center justify-center gap-1.5 text-[11px] font-mono text-muted mb-3 w-full px-2">
-        <span class="truncate max-w-[210px] text-primary font-bold" id="serverIpDisplay">Detecting server address...</span>
-        <button class="px-2.5 py-1 rounded bg-white border border-stone-subtle text-primary text-[10px] font-bold hover:border-primary cursor-pointer active:scale-95 flex items-center gap-1 flex-shrink-0 shadow-sm"
-                onclick="window.setApp.copyServerUrl()">
+        <span class="truncate max-w-[210px] text-primary font-bold" id="serverIpDisplay">Detecting server
+          address...</span>
+        <button
+          class="px-2.5 py-1 rounded bg-white border border-stone-subtle text-primary text-[10px] font-bold hover:border-primary cursor-pointer active:scale-95 flex items-center gap-1 flex-shrink-0 shadow-sm"
+          onclick="window.setApp.copyServerUrl()">
           <span class="material-symbols-outlined text-[13px]">content_copy</span>
           <span>Copy</span>
         </button>
@@ -520,12 +587,13 @@
 
       <!-- Room Name Input -->
       <input id="hostRoomNameInput" type="text" placeholder="Room Name (e.g. Vishesh's Arena)" value="Natural Arena"
-             class="w-full bg-white border border-stone-subtle rounded-xl px-3 py-2 text-xs font-bold text-on-surface focus:outline-none mb-2 shadow-sm"/>
+        class="w-full bg-white border border-stone-subtle rounded-xl px-3 py-2 text-xs font-bold text-on-surface focus:outline-none mb-2 shadow-sm" />
 
       <!-- Max Players -->
       <div class="w-full flex items-center justify-between text-xs text-muted mb-4 px-1">
         <span>Max Players:</span>
-        <select id="hostMaxPlayersSelect" class="bg-white border border-stone-subtle rounded-lg px-2 py-1 text-xs font-bold text-primary shadow-sm">
+        <select id="hostMaxPlayersSelect"
+          class="bg-white border border-stone-subtle rounded-lg px-2 py-1 text-xs font-bold text-primary shadow-sm">
           <option value="2">2 Players</option>
           <option value="3">3 Players</option>
           <option value="4" selected>4 Players</option>
@@ -534,20 +602,24 @@
         </select>
       </div>
 
-      <button class="w-full py-3 btn-primary text-xs font-bold rounded-xl cursor-pointer" onclick="window.setApp.hostNewRoom()">
+      <button class="w-full py-3 btn-primary text-xs font-bold rounded-xl cursor-pointer"
+        onclick="window.setApp.hostNewRoom()">
         🌱 CREATE & OPEN ROOM
       </button>
     </div>
   </div>
 
   <!-- 2. JOIN ROOM PIN MODAL -->
-  <div id="joinModal" class="app-modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+  <div id="joinModal"
+    class="app-modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="glass-panel-heavy w-full max-w-xs p-5 flex flex-col items-center text-center shadow-2xl relative">
-      <button class="absolute top-3 right-3 text-muted hover:text-on-surface cursor-pointer" onclick="window.setApp.closeJoinModal()">
+      <button class="absolute top-3 right-3 text-muted hover:text-on-surface cursor-pointer"
+        onclick="window.setApp.closeJoinModal()">
         <span class="material-symbols-outlined text-xl">close</span>
       </button>
 
-      <div class="w-12 h-12 rounded-full bg-surface-high border border-primary/30 flex items-center justify-center text-primary mb-2 shadow-sm">
+      <div
+        class="w-12 h-12 rounded-full bg-surface-high border border-primary/30 flex items-center justify-center text-primary mb-2 shadow-sm">
         <span class="material-symbols-outlined text-2xl">pin</span>
       </div>
 
@@ -556,26 +628,38 @@
 
       <!-- 4 PIN Inputs -->
       <div class="flex items-center justify-center gap-2 mb-5">
-        <input class="pin-box w-11 h-12 bg-white border-2 border-stone-subtle focus:border-primary rounded-lg text-center text-2xl font-bold text-primary outline-none shadow-sm" maxlength="1" type="number"/>
-        <input class="pin-box w-11 h-12 bg-white border-2 border-stone-subtle focus:border-primary rounded-lg text-center text-2xl font-bold text-primary outline-none shadow-sm" maxlength="1" type="number"/>
-        <input class="pin-box w-11 h-12 bg-white border-2 border-stone-subtle focus:border-primary rounded-lg text-center text-2xl font-bold text-primary outline-none shadow-sm" maxlength="1" type="number"/>
-        <input class="pin-box w-11 h-12 bg-white border-2 border-stone-subtle focus:border-primary rounded-lg text-center text-2xl font-bold text-primary outline-none shadow-sm" maxlength="1" type="number"/>
+        <input
+          class="pin-box w-11 h-12 bg-white border-2 border-stone-subtle focus:border-primary rounded-lg text-center text-2xl font-bold text-primary outline-none shadow-sm"
+          maxlength="1" type="number" />
+        <input
+          class="pin-box w-11 h-12 bg-white border-2 border-stone-subtle focus:border-primary rounded-lg text-center text-2xl font-bold text-primary outline-none shadow-sm"
+          maxlength="1" type="number" />
+        <input
+          class="pin-box w-11 h-12 bg-white border-2 border-stone-subtle focus:border-primary rounded-lg text-center text-2xl font-bold text-primary outline-none shadow-sm"
+          maxlength="1" type="number" />
+        <input
+          class="pin-box w-11 h-12 bg-white border-2 border-stone-subtle focus:border-primary rounded-lg text-center text-2xl font-bold text-primary outline-none shadow-sm"
+          maxlength="1" type="number" />
       </div>
 
-      <button class="w-full py-3 btn-primary text-xs font-bold rounded-xl cursor-pointer" onclick="window.setApp.confirmJoinByCode()">
+      <button class="w-full py-3 btn-primary text-xs font-bold rounded-xl cursor-pointer"
+        onclick="window.setApp.confirmJoinByCode()">
         ENTER ROOM
       </button>
     </div>
   </div>
 
   <!-- 3. CUSTOM DECK CREATOR MODAL -->
-  <div id="customDeckModal" class="app-modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+  <div id="customDeckModal"
+    class="app-modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="glass-panel-heavy w-full max-w-sm p-5 flex flex-col items-center text-center shadow-2xl relative">
-      <button class="absolute top-3 right-3 text-muted hover:text-on-surface cursor-pointer" onclick="window.setApp.closeCustomDeckModal()">
+      <button class="absolute top-3 right-3 text-muted hover:text-on-surface cursor-pointer"
+        onclick="window.setApp.closeCustomDeckModal()">
         <span class="material-symbols-outlined text-xl">close</span>
       </button>
 
-      <div class="w-12 h-12 rounded-full bg-surface-high border border-secondary/30 flex items-center justify-center text-secondary mb-2 shadow-sm">
+      <div
+        class="w-12 h-12 rounded-full bg-surface-high border border-secondary/30 flex items-center justify-center text-secondary mb-2 shadow-sm">
         <span class="material-symbols-outlined text-2xl">style</span>
       </div>
 
@@ -584,45 +668,52 @@
 
       <div class="w-full text-left mb-3">
         <label class="text-[10px] font-bold text-muted uppercase">Deck Category Name</label>
-        <input id="customDeckNameInput" type="text" placeholder="e.g. Wildlife, Mountain Peaks, Gems" 
-               class="w-full bg-white border border-stone-subtle rounded-xl px-3 py-2 text-xs font-bold text-on-surface focus:outline-none mt-1 shadow-sm"/>
+        <input id="customDeckNameInput" type="text" placeholder="e.g. Wildlife, Mountain Peaks, Gems"
+          class="w-full bg-white border border-stone-subtle rounded-xl px-3 py-2 text-xs font-bold text-on-surface focus:outline-none mt-1 shadow-sm" />
       </div>
 
       <div class="w-full text-left mb-4">
         <label class="text-[10px] font-bold text-muted uppercase">Items (Comma separated, 4+ items)</label>
         <textarea id="customDeckItemsInput" rows="3" placeholder="e.g. Eagle, Wolf, Stag, Falcon, Bear"
-                  class="w-full bg-white border border-stone-subtle rounded-xl p-2.5 text-xs text-on-surface focus:outline-none mt-1 shadow-sm"></textarea>
+          class="w-full bg-white border border-stone-subtle rounded-xl p-2.5 text-xs text-on-surface focus:outline-none mt-1 shadow-sm"></textarea>
       </div>
 
-      <button class="w-full py-3 btn-primary text-xs font-bold rounded-xl cursor-pointer" onclick="window.setApp.submitCustomDeck()">
+      <button class="w-full py-3 btn-primary text-xs font-bold rounded-xl cursor-pointer"
+        onclick="window.setApp.submitCustomDeck()">
         ✨ SAVE & USE DECK
       </button>
     </div>
   </div>
 
   <!-- 4. RULES MODAL -->
-  <div id="rulesModal" class="app-modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="glass-panel-heavy w-full max-w-sm p-5 flex flex-col items-center text-left shadow-2xl relative max-h-[85vh] overflow-y-auto">
-      <button class="absolute top-3 right-3 text-muted hover:text-on-surface cursor-pointer" onclick="document.getElementById('rulesModal').classList.add('hidden')">
+  <div id="rulesModal"
+    class="app-modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div
+      class="glass-panel-heavy w-full max-w-sm p-5 flex flex-col items-center text-left shadow-2xl relative max-h-[85vh] overflow-y-auto">
+      <button class="absolute top-3 right-3 text-muted hover:text-on-surface cursor-pointer"
+        onclick="document.getElementById('rulesModal').classList.add('hidden')">
         <span class="material-symbols-outlined text-xl">close</span>
       </button>
 
       <h3 class="font-outfit font-bold text-lg text-primary mb-2">How to Play SET!</h3>
-      
+
       <div class="space-y-3 text-xs text-on-surface">
         <div class="p-2.5 rounded-xl bg-surface-container border border-stone-subtle/70 shadow-sm">
           <p class="font-bold text-primary mb-1">🎯 1. The Goal</p>
-          <p class="text-muted">Collect <strong>4 cards of the same item</strong> (4x Strawberries, 4x Teslas, 4x Lions). The first player to collect 4-of-a-kind and slap the center pile wins!</p>
+          <p class="text-muted">Collect <strong>4 cards of the same item</strong> (4x Strawberries, 4x Teslas, 4x
+            Lions). The first player to collect 4-of-a-kind and slap the center pile wins!</p>
         </div>
 
         <div class="p-2.5 rounded-xl bg-surface-container border border-stone-subtle/70 shadow-sm">
           <p class="font-bold text-primary mb-1">🔄 2. Passing Cards</p>
-          <p class="text-muted">Each player starts with 4 random cards. On your turn, pick 1 card to pass clockwise to the next player. Keep cards that match!</p>
+          <p class="text-muted">Each player starts with 4 random cards. On your turn, pick 1 card to pass clockwise to
+            the next player. Keep cards that match!</p>
         </div>
 
         <div class="p-2.5 rounded-xl bg-surface-container border border-stone-subtle/70 shadow-sm">
           <p class="font-bold text-primary mb-1">📱 3. Phone Multiplayer</p>
-          <p class="text-muted">Host a room on one device, show the QR code. All your friends scan the QR with their phones to join the same table!</p>
+          <p class="text-muted">Host a room on one device, show the QR code. All your friends scan the QR with their
+            phones to join the same table!</p>
         </div>
 
         <div class="p-2.5 rounded-xl bg-surface-container border border-stone-subtle/70 shadow-sm">
@@ -631,18 +722,22 @@
         </div>
       </div>
 
-      <button class="w-full py-2.5 btn-primary text-xs font-bold rounded-xl mt-4 cursor-pointer" onclick="document.getElementById('rulesModal').classList.add('hidden')">
+      <button class="w-full py-2.5 btn-primary text-xs font-bold rounded-xl mt-4 cursor-pointer"
+        onclick="document.getElementById('rulesModal').classList.add('hidden')">
         GOT IT, LET'S PLAY!
       </button>
     </div>
   </div>
 
   <!-- 5. VICTORY CELEBRATION MODAL -->
-  <div id="victoryModal" class="app-modal fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 hidden">
-    <div class="glass-panel-heavy w-full max-w-sm p-6 flex flex-col items-center text-center shadow-2xl relative border-2 border-primary">
-      
+  <div id="victoryModal"
+    class="app-modal fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div
+      class="glass-panel-heavy w-full max-w-sm p-6 flex flex-col items-center text-center shadow-2xl relative border-2 border-primary">
+
       <!-- Top Natural Laurel Header -->
-      <div class="px-3 py-1 rounded-full bg-secondary/15 border border-secondary/30 text-secondary text-[10px] font-bold uppercase tracking-wider mb-2">
+      <div
+        class="px-3 py-1 rounded-full bg-secondary/15 border border-secondary/30 text-secondary text-[10px] font-bold uppercase tracking-wider mb-2">
         MATCH OVER
       </div>
 
@@ -658,17 +753,21 @@
       </p>
 
       <!-- Streak Banner in Modal -->
-      <div id="victoryStreakBanner" class="mb-4 px-3 py-1.5 rounded-xl bg-surface-high border border-stone-subtle flex items-center justify-center gap-2">
+      <div id="victoryStreakBanner"
+        class="mb-4 px-3 py-1.5 rounded-xl bg-surface-high border border-stone-subtle flex items-center justify-center gap-2">
         <span class="text-base">🔥</span>
         <span id="victoryStreakText" class="text-xs font-bold text-primary">Current Streak: 0</span>
       </div>
 
       <!-- Winner Avatar Spotlight -->
-      <div class="relative w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-primary via-tertiary to-secondary shadow-lg mb-4 flex items-center justify-center">
-        <div id="victoryAvatarIcon" class="w-full h-full rounded-full bg-white flex items-center justify-center text-4xl shadow-inner">
+      <div
+        class="relative w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-primary via-tertiary to-secondary shadow-lg mb-4 flex items-center justify-center">
+        <div id="victoryAvatarIcon"
+          class="w-full h-full rounded-full bg-white flex items-center justify-center text-4xl shadow-inner">
           🦊
         </div>
-        <div class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-tertiary text-white flex items-center justify-center font-bold text-xs shadow">
+        <div
+          class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-tertiary text-white flex items-center justify-center font-bold text-xs shadow">
           👑
         </div>
       </div>
@@ -683,11 +782,13 @@
 
       <!-- Dual Actions -->
       <div class="w-full flex flex-col gap-2">
-        <button class="w-full py-3.5 btn-primary text-xs font-black rounded-xl cursor-pointer" onclick="window.setApp.playAgain()">
+        <button class="w-full py-3.5 btn-primary text-xs font-black rounded-xl cursor-pointer"
+          onclick="window.setApp.playAgain()">
           <span class="material-symbols-outlined text-lg">bolt</span>
           <span>PLAY AGAIN</span>
         </button>
-        <button class="w-full py-2.5 btn-secondary text-xs font-bold rounded-xl cursor-pointer" onclick="window.setApp.returnToLobby()">
+        <button class="w-full py-2.5 btn-secondary text-xs font-bold rounded-xl cursor-pointer"
+          onclick="window.setApp.returnToLobby()">
           <span>RETURN TO LOBBY</span>
         </button>
       </div>
@@ -698,4 +799,5 @@
   <!-- Game Engine Script with Cache-Busting -->
   <script src="app.js?v=6.0"></script>
 </body>
+
 </html>

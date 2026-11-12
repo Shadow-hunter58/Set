@@ -2,7 +2,7 @@
 (function() {
   'use strict';
 
-  // --- AUDIO SYNTHESIZER (Web Audio API - Zero External Assets) ---
+  // --- TACTILE CARD AUDIO SYNTHESIZER ---
   const AudioEngine = (function() {
     let ctx = null;
     let enabled = true;
@@ -16,21 +16,115 @@
       }
     }
 
-    function playTone(freq, type, duration, gainValue = 0.15) {
+    // Satisfying Acoustic Hollow Wood Pop (Tactile Card Tap)
+    function playWoodPop(pitch = 560, duration = 0.07, vol = 0.28) {
       if (!enabled) return;
       init();
       if (!ctx) return;
       try {
+        const now = ctx.currentTime;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, ctx.currentTime);
-        gain.gain.setValueAtTime(gainValue, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        const filter = ctx.createBiquadFilter();
+
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(800, now);
+        filter.Q.setValueAtTime(3.5, now);
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(pitch, now);
+        osc.frequency.exponentialRampToValueAtTime(140, now + duration);
+
+        gain.gain.setValueAtTime(vol, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + duration);
+      } catch (e) {}
+    }
+
+    // Resonant Kalimba Bell Chime (Micro-Dopamine Reward)
+    function playKalimba(freq = 523.25, duration = 0.45, vol = 0.25) {
+      if (!enabled) return;
+      init();
+      if (!ctx) return;
+      try {
+        const now = ctx.currentTime;
+        // Fundamental tone
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(freq, now);
+        gain1.gain.setValueAtTime(vol, now);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        // Overtone chime (metallic bell ring)
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(freq * 2.76, now);
+        gain2.gain.setValueAtTime(vol * 0.4, now);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + duration);
+        osc2.stop(now + 0.12);
+      } catch (e) {}
+    }
+
+    // Heavy Card Table Slam (Weighted tactile impact)
+    function playCardSlam() {
+      if (!enabled) return;
+      init();
+      if (!ctx) return;
+      try {
+        const now = ctx.currentTime;
+        // Deep sub-bass thud
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(35, now + 0.22);
+        gain.gain.setValueAtTime(0.55, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
         osc.connect(gain);
         gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + duration);
+        osc.start(now);
+        osc.stop(now + 0.22);
+
+        // Crisp snap crack
+        playWoodPop(760, 0.05, 0.4);
+      } catch (e) {}
+    }
+
+    // High-energy Sparkle Zing Chime
+    function playSparkleChime() {
+      if (!enabled) return;
+      init();
+      if (!ctx) return;
+      try {
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.exponentialRampToValueAtTime(1480, now + 0.12);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.18);
       } catch (e) {}
     }
 
@@ -41,57 +135,54 @@
       },
       isEnabled() { return enabled; },
       cardSelect() {
-        playTone(520, 'sine', 0.08, 0.2);
+        playWoodPop(580, 0.06, 0.3);
       },
       cardPass() {
-        if (!enabled) return;
-        init();
-        if (!ctx) return;
-        try {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(300, ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(700, ctx.currentTime + 0.15);
-          gain.gain.setValueAtTime(0.2, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start();
-          osc.stop(ctx.currentTime + 0.15);
-        } catch (e) {}
+        playWoodPop(480, 0.08, 0.28);
+        setTimeout(() => playKalimba(659.25, 0.2, 0.15), 50); // E5 subtle swoosh
       },
-      cardReceive() {
-        playTone(650, 'sine', 0.12, 0.18);
-        setTimeout(() => playTone(880, 'sine', 0.15, 0.2), 70);
+      cardReceive(matchCount = 1) {
+        if (matchCount >= 3) {
+          playKalimba(783.99, 0.45, 0.3); // G5 chime
+          setTimeout(() => playKalimba(1046.50, 0.4, 0.25), 80); // High C6 sparkle!
+        } else if (matchCount === 2) {
+          playKalimba(587.33, 0.35, 0.22); // D5 cozy pair
+        } else {
+          playWoodPop(620, 0.06, 0.25);
+        }
+      },
+      matchChime(count) {
+        if (count >= 4) {
+          playKalimba(1046.50, 0.5, 0.35);
+          playSparkleChime();
+        } else if (count === 3) {
+          playKalimba(783.99, 0.4, 0.28);
+        } else if (count === 2) {
+          playKalimba(587.33, 0.3, 0.2);
+        }
       },
       turnAlert() {
-        playTone(440, 'sine', 0.1, 0.25);
-        setTimeout(() => playTone(660, 'sine', 0.15, 0.3), 110);
+        playKalimba(659.25, 0.25, 0.25);
+        setTimeout(() => playKalimba(880, 0.3, 0.3), 100);
       },
       victory() {
         if (!enabled) return;
-        init();
-        const chords = [523.25, 659.25, 783.99, 1046.50]; // C Major arpeggio
-        chords.forEach((note, i) => {
-          setTimeout(() => playTone(note, 'triangle', 0.4, 0.25), i * 110);
+        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51]; // Ascending cascade
+        notes.forEach((note, i) => {
+          setTimeout(() => playKalimba(note, 0.5, 0.3), i * 100);
         });
+        setTimeout(() => playSparkleChime(), 420);
       },
       slap() {
-        playTone(180, 'square', 0.12, 0.35);
+        playCardSlam();
+        playSparkleChime();
       },
       slapAlert() {
-        if (!enabled) return;
-        init();
-        if (!ctx) return;
-        try {
-          for (let i = 0; i < 4; i++) {
-            setTimeout(() => playTone(780 + i * 110, 'sawtooth', 0.12, 0.28), i * 85);
-          }
-        } catch (e) {}
+        playKalimba(880, 0.2, 0.35);
+        setTimeout(() => playKalimba(1046.50, 0.25, 0.4), 90);
       },
       error() {
-        playTone(150, 'sawtooth', 0.2, 0.2);
+        playWoodPop(180, 0.15, 0.3);
       }
     };
   })();
@@ -849,30 +940,39 @@
 
     hand.forEach((card, index) => {
       const isSelected = state.selectedCardId === card.id;
-      const isMatching = counts[card.name] > 1;
+      const count = counts[card.name] || 1;
+      const isMatching = count > 1;
+      const isTriple = count === 3;
+      const isQuad = count === 4;
 
       const cardEl = document.createElement('div');
-      cardEl.className = `game-card ${isSelected ? 'selected-pass' : ''} ${isMatching ? 'is-matching' : ''} ${isMyTurn ? 'ring-1 ring-primary/40 cursor-pointer' : ''}`;
+      cardEl.className = `game-card ${isSelected ? 'selected-pass' : ''} ${isMatching ? 'is-matching' : ''} ${isTriple ? 'is-triple' : ''} ${isMyTurn ? 'cursor-pointer' : ''}`;
       cardEl.innerHTML = `
-        ${isSelected ? '<div class="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[9px] font-black uppercase shadow-sm" style="background:#2D5A43; color:#FFFFFF;">PASS ➔</div>' : ''}
-        <div class="w-full flex justify-between items-center text-[10px]">
-          <span class="text-muted font-bold">#${index + 1}</span>
-          <span class="text-primary font-mono">${card.icon || '🃏'}</span>
+        ${isSelected ? '<div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase shadow-md flex items-center gap-1" style="background:#C85A32; color:#FFFFFF;">⚡ PASS THIS</div>' : ''}
+        <div class="w-full flex justify-between items-center text-[10px] px-1 text-muted font-bold font-mono">
+          <span>#${index + 1}</span>
+          <span class="text-xs">✦</span>
         </div>
-        <div class="game-card-icon">${card.icon || '🃏'}</div>
-        <div class="w-full text-center">
-          <span class="text-[11px] font-bold block leading-none text-on-surface truncate">${card.name}</span>
-          <span class="text-[8px] font-bold uppercase tracking-wider ${isMatching ? 'text-primary' : 'text-muted'}">
-            ${counts[card.name] === 4 ? 'SET! 🔥' : (isMatching ? `${counts[card.name]}x MATCH` : 'ODD')}
+        <div class="game-card-icon-well">
+          <span class="game-card-icon">${card.icon || '🃏'}</span>
+        </div>
+        <div class="w-full text-center pb-0.5">
+          <span class="text-[11px] font-extrabold block leading-tight text-on-surface truncate">${card.name}</span>
+          <span class="text-[8px] font-black uppercase tracking-wider mt-0.5 block ${isQuad ? 'text-primary' : (isTriple ? 'text-tertiary' : (isMatching ? 'text-primary' : 'text-muted'))}">
+            ${isQuad ? 'SET! 👑' : (isTriple ? '3x (1 MORE!) ✨' : (isMatching ? '2x PAIR ✨' : '1x ODD'))}
           </span>
         </div>
       `;
 
       cardEl.onclick = () => {
         AudioEngine.cardSelect();
+        if (count > 1) {
+          AudioEngine.matchChime(count);
+        }
         vibrate([30]);
         if (isMyTurn && state.selectedCardId === card.id) {
           // Double-tap or second tap immediately passes the card!
+          triggerPraiseSticker('QUICK PASS! ⚡', cardEl);
           passSelectedCard();
         } else {
           state.selectedCardId = card.id;
@@ -1121,6 +1221,45 @@
     AudioEngine.slap();
   }
 
+  function triggerPraiseSticker(text, targetEl) {
+    const container = document.getElementById('floatingReactionsContainer');
+    if (!container) return;
+    const sticker = document.createElement('div');
+    sticker.className = 'praise-sticker';
+    if (targetEl) {
+      const rect = targetEl.getBoundingClientRect();
+      sticker.style.left = `${rect.left + rect.width / 2 - 40}px`;
+      sticker.style.top = `${rect.top - 12}px`;
+    } else {
+      sticker.style.left = `${35 + Math.random() * 30}%`;
+      sticker.style.bottom = '180px';
+    }
+    sticker.textContent = text;
+    container.appendChild(sticker);
+    setTimeout(() => {
+      if (sticker.parentNode) sticker.parentNode.removeChild(sticker);
+    }, 1500);
+  }
+
+  function triggerSparkleBurst(x, y) {
+    const container = document.getElementById('floatingReactionsContainer');
+    if (!container) return;
+    const icons = ['💥', '✨', '⚡', '⭐', '🔥'];
+    for (let i = 0; i < 3; i++) {
+      const burst = document.createElement('div');
+      burst.className = 'sparkle-burst';
+      const offsetX = (Math.random() - 0.5) * 40;
+      const offsetY = (Math.random() - 0.5) * 30;
+      burst.style.left = `${(x || (window.innerWidth / 2 - 16)) + offsetX}px`;
+      burst.style.top = `${(y || (window.innerHeight / 2 - 16)) + offsetY}px`;
+      burst.textContent = icons[Math.floor(Math.random() * icons.length)];
+      container.appendChild(burst);
+      setTimeout(() => {
+        if (burst.parentNode) burst.parentNode.removeChild(burst);
+      }, 1600);
+    }
+  }
+
   function resetSlapFrenzyUi() {
     state.slapFrenzyActive = false;
     state.frenzyTimers.forEach(clearTimeout);
@@ -1134,12 +1273,12 @@
     if (ring) ring.classList.add('hidden');
     if (tag) {
       tag.classList.add('hidden');
-      tag.textContent = '🚨 SLAP NOW!';
-      tag.className = 'hidden absolute -top-3.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-red-600 text-white shadow-lg animate-bounce';
+      tag.textContent = '⚡ SLAP NOW!';
+      tag.className = 'hidden absolute -top-3.5 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-secondary text-white shadow-lg animate-bounce';
     }
     if (badge) badge.classList.add('hidden');
     if (slapBtn) {
-      slapBtn.classList.remove('glow-cyan', 'ring-4', 'ring-red-500', 'animate-pulse');
+      slapBtn.classList.remove('slap-ready-frenzy');
     }
   }
 
@@ -1147,6 +1286,15 @@
   function slapCenterPile() {
     AudioEngine.slap();
     vibrate([80, 40, 80]);
+
+    const slapBtn = document.getElementById('centerSlapPileBtn');
+    if (slapBtn) {
+      const rect = slapBtn.getBoundingClientRect();
+      triggerSparkleBurst(rect.left + rect.width / 2 - 16, rect.top + rect.height / 2 - 16);
+      triggerPraiseSticker('💥 SLAP!', slapBtn);
+    } else {
+      triggerSparkleBurst();
+    }
 
     if (!state.activeRoom) return;
     const myPlayer = getMyPlayer();
