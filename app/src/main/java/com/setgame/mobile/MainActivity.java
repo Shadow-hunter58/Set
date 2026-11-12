@@ -42,15 +42,15 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(Color.parseColor("#0B0E17"));
-            getWindow().setNavigationBarColor(Color.parseColor("#0B0E17"));
+            getWindow().setStatusBarColor(Color.parseColor("#FAF7F2"));
+            getWindow().setNavigationBarColor(Color.parseColor("#FAF7F2"));
         }
 
         // Inflate standard layout XML
         setContentView(R.layout.activity_main);
 
         webView = findViewById(R.id.webView);
-        webView.setBackgroundColor(Color.parseColor("#0B0E17"));
+        webView.setBackgroundColor(Color.parseColor("#FAF7F2"));
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);

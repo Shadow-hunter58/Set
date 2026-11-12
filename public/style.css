@@ -1,35 +1,55 @@
-/* SET! Midnight Black + Electric Cobalt + Acid Lime Design System */
+/* ==========================================================================
+   SET! - Natural Earth & Organic Tactile Design System
+   Warm Linen, Deep Forest Sage, Terracotta Clay & Honey Ochre
+   ========================================================================== */
+
 :root {
-  --bg-dark: #030712;
-  --surface-lowest: #050914;
-  --surface-low: #0a1128;
-  --surface-container: #101c3d;
-  --surface-high: #172754;
-  --surface-highest: #1f336e;
-  
-  /* Primary Action: Acid Lime */
-  --primary: #ccff00;
-  --primary-neon: #ccff00;
-  --primary-dark: #0f1a00;
-  --lime-glow: rgba(204, 255, 0, 0.45);
+  /* Warm Natural Surface Palette */
+  --bg-dark: #F4EFEA;
+  --bg-main: #F4EFEA;
+  --surface-lowest: #EDE6DC;
+  --surface-low: #E5DDD1;
+  --surface-container: #FAF7F2;
+  --surface-high: #EAE2D5;
+  --surface-highest: #DDD3C3;
 
-  /* Energy Aura: Electric Cobalt Blue */
-  --cobalt: #2979ff;
-  --cobalt-electric: #3d82f6;
-  --cobalt-deep: #1d4ed8;
-  --secondary: #2979ff;
-  --secondary-neon: #2979ff;
-  --cobalt-glow: rgba(41, 121, 255, 0.45);
+  /* Primary Accent: Deep Forest Sage Green */
+  --primary: #2D5A43;
+  --primary-neon: #2D5A43;
+  --primary-dark: #1E3D2D;
+  --primary-light: #E8F0EB;
+  --lime-glow: rgba(45, 90, 67, 0.25);
 
-  /* Accents & Text */
-  --tertiary-neon: #38bdf8;
-  --text-main: #f1f5f9;
-  --text-muted: #8ba1c7;
-  --text-dim: #50658a;
-  
-  --border-glass: rgba(41, 121, 255, 0.2);
-  --border-neon: rgba(204, 255, 0, 0.45);
-  --border-cobalt: rgba(41, 121, 255, 0.45);
+  /* Secondary Accent: Terracotta & Warm Burnt Clay */
+  --secondary: #C85A32;
+  --secondary-neon: #C85A32;
+  --secondary-dark: #A54320;
+  --secondary-light: #FBF0EB;
+  --cobalt: #C85A32;
+  --cobalt-electric: #D96B43;
+  --cobalt-deep: #A54320;
+  --cobalt-glow: rgba(200, 90, 50, 0.25);
+
+  /* Tertiary Accent: Warm Honey Ochre & Amber */
+  --tertiary: #D99B26;
+  --tertiary-neon: #D99B26;
+  --tertiary-light: #FDF6E8;
+
+  /* Typography: Rich Roasted Walnut & Warm Slate */
+  --text-main: #24201D;
+  --text-muted: #6B635B;
+  --text-dim: #948A80;
+
+  /* Tactile Physical Playing Cards */
+  --card-bg: #FFFFFF;
+  --card-border: #D8CEBE;
+  --card-shadow: 0 4px 14px rgba(60, 50, 40, 0.08), 0 1px 3px rgba(60, 50, 40, 0.04);
+  --card-hover-shadow: 0 8px 22px rgba(60, 50, 40, 0.12), 0 2px 6px rgba(60, 50, 40, 0.06);
+
+  /* Borders & Glass */
+  --border-glass: rgba(70, 55, 40, 0.12);
+  --border-neon: rgba(45, 90, 67, 0.4);
+  --border-cobalt: rgba(200, 90, 50, 0.35);
 }
 
 * {
@@ -40,7 +60,7 @@
 }
 
 body {
-  background-color: var(--bg-dark);
+  background-color: var(--bg-main);
   color: var(--text-main);
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
@@ -50,21 +70,21 @@ body {
   justify-content: center;
 }
 
-/* App Container */
+/* App Mobile Frame */
 .app-container {
   width: 100%;
   max-width: 440px;
   min-height: 100vh;
   min-height: 100dvh;
   position: relative;
-  background-color: var(--surface-lowest);
+  background-color: var(--surface-container);
   overflow-x: hidden;
-  box-shadow: 0 0 60px rgba(0, 0, 0, 0.95), 0 0 20px rgba(41, 121, 255, 0.15);
+  box-shadow: 0 0 50px rgba(60, 50, 40, 0.12), 0 4px 20px rgba(60, 50, 40, 0.06);
   display: flex;
   flex-direction: column;
 }
 
-/* Cyber Ambient Gradients: Electric Cobalt & Acid Lime */
+/* Natural Ambient Gradients: Soft Sunlight, Sage Leaf & Clay */
 .cyber-bg {
   position: fixed;
   inset: 0;
@@ -72,80 +92,91 @@ body {
   z-index: 0;
   overflow: hidden;
 }
+
 .blob-cyan {
   position: absolute;
-  top: -120px;
+  top: -100px;
   left: 50%;
   transform: translateX(-50%);
-  width: 360px;
-  height: 360px;
+  width: 380px;
+  height: 380px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(41, 121, 255, 0.22) 0%, rgba(29, 78, 216, 0.08) 50%, transparent 70%);
-  filter: blur(70px);
+  background: radial-gradient(circle, rgba(235, 205, 140, 0.28) 0%, rgba(220, 190, 130, 0.12) 50%, transparent 75%);
+  filter: blur(60px);
 }
+
 .blob-purple {
   position: absolute;
   top: 35%;
   right: -90px;
-  width: 300px;
-  height: 300px;
+  width: 320px;
+  height: 320px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(204, 255, 0, 0.14) 0%, transparent 70%);
-  filter: blur(80px);
+  background: radial-gradient(circle, rgba(160, 195, 175, 0.25) 0%, transparent 70%);
+  filter: blur(65px);
 }
+
 .blob-coral {
   position: absolute;
   bottom: 12%;
   left: -90px;
-  width: 280px;
-  height: 280px;
+  width: 300px;
+  height: 300px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(41, 121, 255, 0.18) 0%, transparent 70%);
-  filter: blur(75px);
+  background: radial-gradient(circle, rgba(225, 160, 130, 0.2) 0%, transparent 70%);
+  filter: blur(65px);
 }
 
-/* Glass Panels */
+/* Tactile Panels (Warm Linen Glass) */
 .glass-panel {
-  background: rgba(16, 28, 61, 0.72);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--border-glass);
   border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(60, 50, 40, 0.05);
 }
+
 .glass-panel-heavy {
-  background: rgba(10, 17, 40, 0.92);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(41, 121, 255, 0.35);
+  background: rgba(250, 247, 242, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(70, 55, 40, 0.16);
   border-radius: 20px;
+  box-shadow: 0 12px 36px rgba(60, 50, 40, 0.16), 0 2px 8px rgba(60, 50, 40, 0.06);
 }
 
-/* Glow Utilities */
+/* Subtle Soft Shadows replacing neon harshness */
 .glow-cyan {
-  box-shadow: 0 0 20px rgba(204, 255, 0, 0.45), 0 0 40px rgba(41, 121, 255, 0.2);
-}
-.glow-cyan-sm {
-  box-shadow: 0 0 10px rgba(204, 255, 0, 0.35);
-}
-.glow-purple {
-  box-shadow: 0 0 22px rgba(41, 121, 255, 0.45);
-}
-.glow-coral {
-  box-shadow: 0 0 16px rgba(204, 255, 0, 0.4);
-}
-.text-glow {
-  text-shadow: 0 0 14px rgba(204, 255, 0, 0.75);
-}
-.text-glow-cobalt {
-  text-shadow: 0 0 14px rgba(41, 121, 255, 0.8);
+  box-shadow: 0 4px 18px rgba(45, 90, 67, 0.25);
 }
 
-/* Buttons */
+.glow-cyan-sm {
+  box-shadow: 0 2px 8px rgba(45, 90, 67, 0.16);
+}
+
+.glow-purple {
+  box-shadow: 0 4px 18px rgba(200, 90, 50, 0.22);
+}
+
+.glow-coral {
+  box-shadow: 0 4px 16px rgba(217, 155, 38, 0.2);
+}
+
+.text-glow {
+  text-shadow: none;
+}
+
+.text-glow-cobalt {
+  text-shadow: none;
+}
+
+/* Primary Natural Button: Deep Forest Sage */
 .btn-primary {
-  background: linear-gradient(135deg, #ccff00 0%, #b8f000 100%);
-  color: #030712;
+  background: linear-gradient(135deg, #2D5A43 0%, #224634 100%);
+  color: #FFFFFF !important;
   font-family: 'Outfit', sans-serif;
-  font-weight: 900;
+  font-weight: 800;
   border: none;
   border-radius: 14px;
   cursor: pointer;
@@ -153,38 +184,132 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 0 24px rgba(204, 255, 0, 0.45), 0 4px 14px rgba(0, 0, 0, 0.6);
+  transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+  box-shadow: 0 4px 16px rgba(45, 90, 67, 0.32), 0 2px 4px rgba(45, 90, 67, 0.15);
 }
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #35694E 0%, #28523D 100%);
+  box-shadow: 0 6px 20px rgba(45, 90, 67, 0.4);
+}
+
 .btn-primary:active {
   transform: scale(0.97);
 }
+
+/* Secondary Button: Warm Sand & Stone */
 .btn-secondary {
-  background: rgba(23, 39, 84, 0.85);
+  background: var(--surface-high);
   color: var(--text-main);
-  border: 1px solid rgba(41, 121, 255, 0.3);
+  border: 1px solid var(--card-border);
   border-radius: 12px;
   font-family: 'Outfit', sans-serif;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   transition: all 0.15s;
+  box-shadow: 0 2px 6px rgba(60, 50, 40, 0.05);
 }
+
 .btn-secondary:hover {
-  border-color: var(--primary-neon);
+  background: var(--surface-low);
+  border-color: var(--primary);
   color: var(--primary);
 }
+
 .btn-secondary:active {
   transform: scale(0.96);
 }
 
+/* Tactile Playing Card Component (Ivory Linen with Stone Borders) */
+.game-card {
+  height: 124px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  border: 1px solid var(--card-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 6px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, box-shadow 0.2s;
+  user-select: none;
+  box-shadow: var(--card-shadow);
+}
+
+.game-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--card-hover-shadow);
+  border-color: rgba(45, 90, 67, 0.4);
+}
+
+/* Selected Card to Pass */
+.game-card.selected-pass {
+  transform: translateY(-12px);
+  border: 2px solid var(--secondary);
+  box-shadow: 0 10px 24px rgba(200, 90, 50, 0.28), 0 2px 6px rgba(200, 90, 50, 0.15);
+  background: #FFFDF9;
+}
+
+.game-card.is-matching {
+  border-color: rgba(45, 90, 67, 0.6);
+  background: #F8FAF8;
+}
+
+.game-card-icon {
+  font-size: 32px;
+  filter: drop-shadow(0 2px 6px rgba(60, 50, 40, 0.12));
+  margin: auto 0;
+}
+
+.game-card.selected-pass .game-card-icon {
+  animation: card-bounce 0.8s infinite ease-in-out;
+}
+
+@keyframes card-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* Center Slap Button: Tactile Terracotta Clay Wax Seal */
+#centerSlapPileBtn {
+  background: linear-gradient(135deg, #C85A32 0%, #B24B25 100%) !important;
+  border: 3px solid #FAF7F2 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 8px 26px rgba(200, 90, 50, 0.4), 0 2px 6px rgba(200, 90, 50, 0.2) !important;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+#centerSlapPileBtn span.material-symbols-outlined {
+  color: #FFFFFF !important;
+}
+
+#centerSlapPileBtn span.font-outfit {
+  color: #FFFFFF !important;
+}
+
+#centerSlapPileBtn span.uppercase {
+  color: #FBD7CC !important;
+}
+
+#centerSlapPileBtn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 10px 30px rgba(200, 90, 50, 0.5) !important;
+}
+
+#centerSlapPileBtn:active {
+  transform: scale(0.92);
+}
+
 /* Animations */
 @keyframes pulse-ring {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.05); opacity: 1; }
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.04); opacity: 1; }
 }
 .anim-pulse {
   animation: pulse-ring 2.5s infinite ease-in-out;
@@ -195,58 +320,7 @@ body {
   to { transform: rotate(360deg); }
 }
 .anim-spin-slow {
-  animation: rotate-slow 18s linear infinite;
-}
-
-@keyframes card-pass-anim {
-  0% { transform: translate(-60px, -40px) scale(0.6) rotate(-20deg); opacity: 0; }
-  30% { opacity: 1; }
-  80% { transform: translate(30px, 20px) scale(0.9) rotate(5deg); opacity: 0.9; }
-  100% { transform: translate(60px, 40px) scale(1) rotate(0deg); opacity: 0; }
-}
-.anim-card-flight {
-  animation: card-pass-anim 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-}
-
-/* Playing Card Component */
-.game-card {
-  height: 124px;
-  border-radius: 14px;
-  background: rgba(20, 33, 68, 0.9);
-  border: 1px solid rgba(41, 121, 255, 0.25);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 6px;
-  cursor: pointer;
-  position: relative;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, box-shadow 0.2s;
-  user-select: none;
-}
-.game-card:hover {
-  transform: translateY(-4px);
-}
-.game-card.selected-pass {
-  transform: translateY(-12px);
-  border: 2px solid #ccff00;
-  box-shadow: 0 0 24px rgba(204, 255, 0, 0.65), 0 0 12px rgba(41, 121, 255, 0.4);
-  background: linear-gradient(180deg, #1f336e 0%, #0a1128 100%);
-}
-.game-card.is-matching {
-  border-color: rgba(41, 121, 255, 0.6);
-}
-.game-card-icon {
-  font-size: 32px;
-  filter: drop-shadow(0 0 8px rgba(41, 121, 255, 0.3));
-  margin: auto 0;
-}
-.game-card.selected-pass .game-card-icon {
-  animation: card-bounce 0.8s infinite ease-in-out;
-}
-@keyframes card-bounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.18); }
+  animation: rotate-slow 24s linear infinite;
 }
 
 /* Floating Emoji Reactions */
@@ -267,8 +341,9 @@ body {
 /* Confetti particles for victory */
 .confetti-particle {
   position: absolute;
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
   pointer-events: none;
   animation: confetti-fall 2.5s forwards linear;
 }
@@ -277,35 +352,11 @@ body {
   100% { transform: translateY(500px) rotate(720deg); opacity: 0; }
 }
 
-/* Scrollbars */
+/* Utility Scrollbars */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-/* Slap Frenzy Emergency Beacon */
-@keyframes slap-strobe {
-  0%, 100% {
-    box-shadow: 0 0 25px rgba(239, 68, 68, 0.9), 0 0 50px rgba(204, 255, 0, 0.6);
-    border-color: #ef4444;
-  }
-  50% {
-    box-shadow: 0 0 35px rgba(204, 255, 0, 0.95), 0 0 70px rgba(239, 68, 68, 0.8);
-    border-color: #ccff00;
-  }
-}
-
-.center-slap-frenzy {
-  animation: slap-strobe 0.4s infinite alternate ease-in-out;
-}
-
-/* Arena Size Toggle Buttons */
-.player-count-btn {
-  user-select: none;
-}
-.player-count-btn:active {
-  transform: scale(0.94);
 }

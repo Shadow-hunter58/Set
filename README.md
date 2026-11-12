@@ -1,6 +1,6 @@
-# 🔥 SET! - 4-of-a-Kind Multiplayer Card Game
+# 🌿 SET! - 4-of-a-Kind Multiplayer Card Game
 
-An Android and Mobile Web multiplayer adaptation of the [SET! Card Game](https://github.com/Shadow-hunter58/Set.git), featuring the **Luminous Deck** cyberpunk neon design created with Stitch, real-time cross-phone multiplayer, and native Android support.
+An Android and Mobile Web multiplayer adaptation of the [SET! Card Game](https://github.com/Shadow-hunter58/Set.git), featuring a **Natural Earth & Tactile Card** design system with warm linen parchment, deep forest sage, terracotta clay, real-time cross-phone multiplayer, and native Android support.
 
 ---
 
@@ -9,11 +9,11 @@ An Android and Mobile Web multiplayer adaptation of the [SET! Card Game](https:/
 1. **📱 Play Across Multiple Phones**:
    - The original `SET.py` was a single-computer CLI script where players had to share a keyboard.
    - This version lets **each player play from their own Android phone or mobile browser** simultaneously over local Wi-Fi or hotspot!
-2. **✨ Stitch "Luminous Deck" Design**:
-   - Dark obsidian surfaces (`#0b0e17`, `#10131c`), vibrant neon cyan (`#00f5d4`) and magenta glow accents.
-   - Interactive 4-card player hand with tap-to-select, match highlights, and pass animations.
-   - Circular radial table HUD showing all players' avatars, card counts, and live clockwise pass trail.
-   - Center holographic **SET! Slap Pile** for lightning-fast reactions when 4 matching cards are collected.
+2. **🌿 Natural Earth & Tactile Design**:
+   - Warm organic parchment & linen canvas (`#F4EFEA`, `#FAF7F2`) replacing harsh dark cyber neon.
+   - Tactile ivory playing cards with soft stone borders, realistic paper depth, and elevation shadows.
+   - Deep forest sage green (`#2D5A43`) action buttons, rich terracotta clay accents (`#C85A32`), and warm honey ochre highlights (`#D99B26`).
+   - Circular tabletop HUD with organic wooden/stone avatar tokens and a physical wax-seal **SET! Slap Pile**.
 3. **⚡ Zero External npm Dependencies**:
    - Pure Node.js standard library (`http`, `crypto`, `os`, `fs`) with a native RFC 6455 WebSocket engine.
    - Works 100% reliably in restricted, firewalled, or offline environments.
@@ -64,14 +64,10 @@ The terminal will display:
    - Collect **4 cards of the same item** (e.g. 4x Strawberries, 4x Teslas, 4x Lions).
 2. **Passing Cards**:
    - Each player begins with 4 cards.
-   - On your turn, tap the odd card in your hand and tap **"PASS SELECTED CARD"** (or double-tap the card) to pass it clockwise.
-3. **Slapping the Pile & Reaction Frenzy**:
-   - As soon as you collect 4-of-a-kind (or pass your final odd card), tap **"SLAP SET PILE!"** to claim **🥇 1st Place (SET Caller)**!
-   - This instantly triggers an emergency **SLAP FRENZY** for all players!
-   - **All other players (humans & AI bots) must immediately SLAP the center pile** to claim **🥈 2nd Place**, **🥉 3rd Place**, **4th Place**, etc.
-   - The slowest player or anyone who fails to slap ends up in **🫏 Last Place (Donkey / Out)**!
-4. **Arena Winner Board**:
-   - Shows the complete standings podium with reaction times, winning hand showcase, and win streaks.
+   - On your turn, tap the odd card in your hand and tap **"PASS SELECTED CARD"** to pass it clockwise.
+3. **Calling SET! & Winning**:
+   - As soon as you hold 4 matching cards, SLAP the glowing center pile!
+   - The game triggers a victory celebration with confetti, winner spotlight, and scoreboard.
 
 ---
 
@@ -88,15 +84,15 @@ The game includes presets and custom categories:
 
 ## 📱 Android Studio Project
 
-The `app/` directory contains the complete native Android project:
+The `android/` directory contains the complete native Android project:
 - **Package**: `com.setgame.mobile`
 - **Minimum SDK**: 24 (Android 7.0+)
 - **Target SDK**: 34 (Android 14+)
-- **Features**: Immersive fullscreen, hardware accelerated WebView, cleartext HTTP support for local LAN connections, offline bundled assets from `public/`.
+- **Features**: Immersive fullscreen, hardware accelerated WebView, cleartext HTTP support for local LAN connections, offline bundled assets.
 
 To open and run:
 1. Open Android Studio.
-2. Select **Open an Existing Project** and navigate to this root folder.
+2. Select **Open an Existing Project** and navigate to `android/`.
 3. Connect your Android phone via USB (or start an emulator) and click **Run**.
 
 ---
@@ -104,20 +100,23 @@ To open and run:
 ## 📂 Project Structure
 
 ```
-SET-Card-Game/
-├── app/                       # Android App Module
-│   ├── build.gradle           # Configured to use public/ for assets
-│   └── src/main/
-│       ├── AndroidManifest.xml
-│       ├── java/com/setgame/mobile/MainActivity.java
-│       └── res/               # Android layouts and icons
-├── public/                    # Unified Web Assets (Used by Android & Node.js)
-│   ├── index.html             # Single-page UI
+set-card-game/
+├── android/                   # Native Android Studio Project
+│   ├── app/src/main/
+│   │   ├── AndroidManifest.xml
+│   │   ├── java/com/setgame/mobile/MainActivity.java
+│   │   └── assets/            # Bundled offline assets
+│   ├── build.gradle
+│   └── settings.gradle
+├── public/                    # Frontend Mobile App (Luminous Deck)
+│   ├── index.html             # Single-page UI with Stitch designs & modals
 │   ├── style.css              # Cyberpunk tokens, glows & animations
-│   └── app.js                 # Game client, WebSocket sync & Web Audio synth
+│   ├── app.js                 # Game client, WebSocket sync & Web Audio synth
+│   ├── icon.svg               # Vector icon
+│   ├── manifest.json          # PWA configuration
+│   └── sw.js                  # PWA service worker
 ├── server.js                  # Zero-dependency Node.js WebSocket & HTTP server
-├── custom_categories.txt      # Custom decks storage
-├── build.gradle               # Root Gradle build file
-├── settings.gradle            # Gradle settings
+├── custom_categories.txt      # Custom decks storage (compatible with SET.py)
+├── SET.py                     # Original Python game script
 └── README.md                  # Documentation
 ```
