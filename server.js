@@ -6,7 +6,7 @@ const path = require('path');
 const os = require('os');
 const crypto = require('crypto');
 
-const PORT = process.env.PORT || 3000;
+let PORT = parseInt(process.env.PORT, 10) || 3000;
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const CUSTOM_CATEGORIES_FILE = path.join(__dirname, 'custom_categories.txt');
 
@@ -1295,13 +1295,33 @@ const server = http.createServer((req, res) => {
 
 server.on('upgrade', handleWebSocketUpgrade);
 
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`\n======================================================`);
-  console.log(`  🔥 SET! 4-of-a-Kind Card Game Server is LIVE 🔥`);
-  console.log(`======================================================`);
-  console.log(`- Local Access:   http://localhost:${PORT}`);
-  console.log(`- Mobile / Wi-Fi: http://${PRIMARY_IP}:${PORT}`);
-  console.log(`- WebSocket URL:  ws://${PRIMARY_IP}:${PORT}/ws`);
-  console.log(`- Live QR Code:   http://${PRIMARY_IP}:${PORT}/api/qr`);
-  console.log(`======================================================\n`);
+function startServer(portToTry) {
+  server.listen(portToTry, '0.0.0.0', () => {
+    PORT = portToTry;
+    console.log(`\n======================================================`);
+    console.log(`  🔥 SET! 4-of-a-Kind Card Game Server is LIVE 🔥`);
+    console.log(`======================================================`);
+    console.log(`- Local Access:   http://localhost:${PORT}`);
+    console.log(`- Mobile / Wi-Fi: http://${PRIMARY_IP}:${PORT}`);
+    console.log(`- WebSocket URL:  ws://${PRIMARY_IP}:${PORT}/ws`);
+    console.log(`- Live QR Code:   http://${PRIMARY_IP}:${PORT}/api/qr`);
+    console.log(`======================================================\n`);
+  });
+}
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    if (process.env.PORT) {
+      console.error(`⚠️ Port ${PORT} is in use.`);
+      process.exit(1);
+    } else {
+      console.log(`⚠️ Port ${PORT} is in use (e.g. Docker container). Auto-switching to port ${PORT + 1}...`);
+      PORT++;
+      startServer(PORT);
+    }
+  } else {
+    console.error('Server error:', err);
+  }
 });
+
+startServer(PORT);

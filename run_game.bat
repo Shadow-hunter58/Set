@@ -4,6 +4,7 @@ cd /d "%~dp0"
 echo ======================================================
 echo   Starting SET! Card Passing Arena Server...
 echo ======================================================
-start "" http://localhost:3000
+set PORT=3005
+start "" http://localhost:3005
 node server.js
 pause
