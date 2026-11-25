@@ -1,9 +1,9 @@
-const CACHE_NAME = 'set-game-v5';
+const CACHE_NAME = 'set-game-v6';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/style.css?v=4.0',
-  '/app.js?v=7.0',
+  '/style.css?v=5.0',
+  '/app.js?v=8.0',
   '/icon.svg',
   '/icon-192.png',
   '/icon-512.png',

@@ -2079,6 +2079,18 @@
     }
 
     // Avatar selector elements
+    function updateAvatarSelectionUI() {
+      const current = state.playerAvatar || 'fox';
+      document.querySelectorAll('.avatar-option').forEach(item => {
+        const av = item.getAttribute('data-avatar');
+        if (av === current) {
+          item.classList.add('active-avatar');
+        } else {
+          item.classList.remove('active-avatar');
+        }
+      });
+    }
+
     document.querySelectorAll('.avatar-option').forEach(el => {
       el.onclick = () => {
         const av = el.getAttribute('data-avatar');
@@ -2086,15 +2098,12 @@
         localStorage.setItem('set_player_avatar', av);
         AudioEngine.cardSelect();
         vibrate([20]);
-
-        document.querySelectorAll('.avatar-option').forEach(item => {
-          item.classList.remove('active-avatar');
-          item.classList.add('opacity-75');
-        });
-        el.classList.add('active-avatar');
-        el.classList.remove('opacity-75');
+        updateAvatarSelectionUI();
       };
     });
+
+    // Initialize saved avatar selection on load
+    updateAvatarSelectionUI();
 
     // Pin input auto-focus flow
     const pinBoxes = document.querySelectorAll('.pin-box');

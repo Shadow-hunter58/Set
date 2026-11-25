@@ -1,56 +1,35 @@
-/* ==========================================================================
-   SET! - Tactile Card Slam & Natural Linen Earth-Tone Design System
-   Warm Ceramic Cream, Deep Forest Sage, Terracotta Clay & Golden Honey
-   ========================================================================== */
-
+/* SET! Warm Cream + Forest Green + Terracotta Design System */
 :root {
-  /* Warm Natural Surface Palette */
-  --bg-dark: #F5EFEB;
-  --bg-main: #F5EFEB;
-  --surface-lowest: #EDE4DC;
-  --surface-low: #E4D8CE;
-  --surface-container: #FAF6F0;
-  --surface-high: #EAE0D5;
-  --surface-highest: #DCD0C2;
+  --bg-dark: #f5f0e8;
+  --surface-lowest: #f5f0e8;
+  --surface-low: #fdfaf4;
+  --surface-container: #ffffff;
+  --surface-high: #efe8dc;
+  --surface-highest: #e6dcc9;
 
-  /* Matcha Green / Forest Sage */
-  --primary: #2D5A43;
-  --primary-neon: #2D5A43;
-  --primary-dark: #1E3D2D;
-  --primary-light: #EBF2EC;
-  --lime-glow: rgba(45, 90, 67, 0.25);
+  /* Primary Action: Forest Green */
+  --primary: #2d5a3d;
+  --primary-neon: #2d5a3d;
+  --primary-dark: #1e3d28;
+  --lime-glow: rgba(45, 90, 61, 0.25);
 
-  /* Terracotta Clay & Coral Amber */
-  --secondary: #C85A32;
-  --secondary-neon: #C85A32;
-  --secondary-dark: #9E3F1C;
-  --secondary-light: #FBF0EB;
-  --accent-coral: #F38C68;
-  --cobalt: #C85A32;
-  --cobalt-electric: #D96B43;
-  --cobalt-deep: #A54320;
-  --cobalt-glow: rgba(200, 90, 50, 0.25);
+  /* Energy Aura: Terracotta */
+  --cobalt: #e07856;
+  --cobalt-electric: #e07856;
+  --cobalt-deep: #c95f3f;
+  --secondary: #e07856;
+  --secondary-neon: #e07856;
+  --cobalt-glow: rgba(224, 120, 86, 0.3);
 
-  /* Warm Honey Ochre & Star Amber */
-  --tertiary: #D99B26;
-  --tertiary-neon: #D99B26;
-  --tertiary-light: #FDF6E8;
+  /* Accents & Text */
+  --tertiary-neon: #5b8def;
+  --text-main: #2b2b2b;
+  --text-muted: #8a8578;
+  --text-dim: #a89f8e;
 
-  /* Typography: Rich Roasted Walnut & Warm Slate */
-  --text-main: #24201D;
-  --text-muted: #6B635B;
-  --text-dim: #948A80;
-
-  /* Tactile Physical Playing Cards */
-  --card-bg: #FFFFFF;
-  --card-border: #E4D9CC;
-  --card-bevel: #D2C4B2;
-  --card-shadow: 0 4px 0 #D2C4B2, 0 8px 18px rgba(70, 55, 40, 0.08), inset 0 2px 0 rgba(255, 255, 255, 0.9);
-
-  /* Borders & Glass */
-  --border-glass: rgba(70, 55, 40, 0.12);
-  --border-neon: rgba(45, 90, 67, 0.4);
-  --border-cobalt: rgba(200, 90, 50, 0.35);
+  --border-glass: rgba(45, 90, 61, 0.12);
+  --border-neon: rgba(45, 90, 61, 0.35);
+  --border-cobalt: rgba(224, 120, 86, 0.35);
 }
 
 * {
@@ -61,7 +40,7 @@
 }
 
 body {
-  background-color: var(--bg-main);
+  background-color: #f5f0e8;
   color: var(--text-main);
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
@@ -71,21 +50,21 @@ body {
   justify-content: center;
 }
 
-/* App Mobile Frame */
+/* App Container */
 .app-container {
   width: 100%;
   max-width: 440px;
   min-height: 100vh;
   min-height: 100dvh;
   position: relative;
-  background-color: var(--surface-container);
+  background-color: #f5f0e8;
   overflow-x: hidden;
-  box-shadow: 0 0 50px rgba(60, 50, 40, 0.12), 0 4px 20px rgba(60, 50, 40, 0.06);
+  box-shadow: 0 0 40px rgba(45, 90, 61, 0.08);
   display: flex;
   flex-direction: column;
 }
 
-/* Natural Ambient Gradients: Warm Sunlight & Sage Mist */
+/* Warm Ambient Gradients: Forest Green & Terracotta */
 .cyber-bg {
   position: fixed;
   inset: 0;
@@ -93,335 +72,119 @@ body {
   z-index: 0;
   overflow: hidden;
 }
-
 .blob-cyan {
   position: absolute;
-  top: -100px;
+  top: -120px;
   left: 50%;
   transform: translateX(-50%);
-  width: 380px;
-  height: 380px;
+  width: 360px;
+  height: 360px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(240, 215, 150, 0.3) 0%, rgba(225, 200, 140, 0.12) 50%, transparent 75%);
-  filter: blur(60px);
+  background: radial-gradient(circle, rgba(45, 90, 61, 0.10) 0%, rgba(45, 90, 61, 0.04) 50%, transparent 70%);
+  filter: blur(70px);
 }
-
 .blob-purple {
   position: absolute;
   top: 35%;
   right: -90px;
-  width: 320px;
-  height: 320px;
+  width: 300px;
+  height: 300px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(165, 205, 180, 0.25) 0%, transparent 70%);
-  filter: blur(65px);
+  background: radial-gradient(circle, rgba(224, 120, 86, 0.10) 0%, transparent 70%);
+  filter: blur(80px);
 }
-
 .blob-coral {
   position: absolute;
   bottom: 12%;
   left: -90px;
-  width: 300px;
-  height: 300px;
+  width: 280px;
+  height: 280px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 175, 145, 0.22) 0%, transparent 70%);
-  filter: blur(65px);
+  background: radial-gradient(circle, rgba(91, 141, 239, 0.10) 0%, transparent 70%);
+  filter: blur(75px);
 }
 
-/* Tactile Panels (Cozy Wooden Tray Glass) */
+/* Glass Panels */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1.5px solid var(--border-glass);
-  border-radius: 18px;
-  box-shadow: 0 4px 16px rgba(60, 50, 40, 0.05);
-}
-
-.glass-panel-heavy {
-  background: rgba(250, 246, 240, 0.97);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 2px solid rgba(70, 55, 40, 0.15);
-  border-radius: 22px;
-  box-shadow: 0 14px 40px rgba(60, 50, 40, 0.18), 0 2px 8px rgba(60, 50, 40, 0.06);
-}
-
-/* Subtle Soft Shadows replacing neon harshness */
-.glow-cyan {
-  box-shadow: 0 4px 18px rgba(45, 90, 67, 0.25);
-}
-
-.glow-cyan-sm {
-  box-shadow: 0 2px 8px rgba(45, 90, 67, 0.16);
-}
-
-.glow-purple {
-  box-shadow: 0 4px 18px rgba(200, 90, 50, 0.22);
-}
-
-.glow-coral {
-  box-shadow: 0 4px 16px rgba(217, 155, 38, 0.2);
-}
-
-.text-glow {
-  text-shadow: none;
-}
-
-.text-glow-cobalt {
-  text-shadow: none;
-}
-
-/* Primary Chunky Tactile Button */
-.btn-primary {
-  background: linear-gradient(135deg, #2D5A43 0%, #1E3D2D 100%);
-  color: #FFFFFF !important;
-  font-family: 'Outfit', sans-serif;
-  font-weight: 800;
-  border: none;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(45, 90, 61, 0.10);
   border-radius: 16px;
+}
+.glass-panel-heavy {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(45, 90, 61, 0.18);
+  border-radius: 20px;
+}
+
+/* Glow Utilities */
+.glow-cyan {
+  box-shadow: 0 4px 16px rgba(45, 90, 61, 0.20), 0 2px 8px rgba(45, 90, 61, 0.12);
+}
+.glow-cyan-sm {
+  box-shadow: 0 2px 8px rgba(45, 90, 61, 0.15);
+}
+.glow-purple {
+  box-shadow: 0 4px 18px rgba(224, 120, 86, 0.22);
+}
+.glow-coral {
+  box-shadow: 0 2px 10px rgba(45, 90, 61, 0.18);
+}
+.text-glow {
+  text-shadow: 0 1px 2px rgba(45, 90, 61, 0.15);
+}
+.text-glow-cobalt {
+  text-shadow: 0 1px 2px rgba(224, 120, 86, 0.2);
+}
+
+/* Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, #2d5a3d 0%, #3d7350 100%);
+  color: #fdfaf4;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  border: none;
+  border-radius: 14px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s;
-  box-shadow: 0 4px 0 #162C20, 0 6px 16px rgba(45, 90, 67, 0.35);
+  transition: transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(45, 90, 61, 0.30);
 }
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 #162C20, 0 10px 22px rgba(45, 90, 67, 0.42);
-}
-
 .btn-primary:active {
-  transform: translateY(3px) scale(0.98);
-  box-shadow: 0 1px 0 #162C20, 0 3px 8px rgba(45, 90, 67, 0.25);
+  transform: scale(0.97);
 }
-
-/* Secondary Button: Chunky Wooden Biscuit */
 .btn-secondary {
-  background: var(--surface-high);
+  background: #efe8dc;
   color: var(--text-main);
-  border: 1.5px solid var(--card-border);
-  border-radius: 14px;
+  border: 1px solid rgba(45, 90, 61, 0.2);
+  border-radius: 12px;
   font-family: 'Outfit', sans-serif;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 3px 0 var(--card-bevel), 0 4px 10px rgba(60, 50, 40, 0.06);
+  transition: all 0.15s;
 }
-
 .btn-secondary:hover {
-  background: var(--surface-low);
-  border-color: var(--primary);
+  border-color: var(--primary-neon);
   color: var(--primary);
-  transform: translateY(-2px);
 }
-
 .btn-secondary:active {
-  transform: translateY(2px) scale(0.97);
-  box-shadow: 0 1px 0 var(--card-bevel);
-}
-
-/* ==========================================================================
-   CHUNKY TACTILE CARD TILE COMPONENT (Weighted Physics & Beveled Depth)
-   ========================================================================== */
-.game-card {
-  height: 136px;
-  border-radius: 20px;
-  background: #FFFFFF;
-  border: 2px solid var(--card-border);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 6px;
-  cursor: pointer;
-  position: relative;
-  user-select: none;
-  box-shadow: var(--card-shadow);
-  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s;
-}
-
-.game-card:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 8px 0 var(--card-bevel), 0 14px 26px rgba(70, 55, 40, 0.12);
-  border-color: rgba(45, 90, 67, 0.45);
-}
-
-.game-card:active {
-  transform: translateY(3px) scale(0.95);
-  box-shadow: 0 1px 0 var(--card-bevel), 0 3px 8px rgba(70, 55, 40, 0.1);
-}
-
-/* Selected Card To Pass */
-.game-card.selected-pass {
-  transform: translateY(-16px) scale(1.04);
-  border: 2.5px solid var(--secondary);
-  background: #FFFDF9;
-  box-shadow: 0 8px 0 var(--secondary-dark), 0 16px 30px rgba(200, 90, 50, 0.32), inset 0 2px 0 rgba(255, 255, 255, 0.95);
-}
-
-.game-card.is-matching {
-  border-color: var(--primary);
-  background: #F8FAF8;
-}
-
-.game-card.is-triple {
-  border-color: var(--tertiary);
-  background: #FFFAF0;
-  animation: gold-pulse 1.8s infinite ease-in-out;
-}
-
-@keyframes gold-pulse {
-  0%, 100% { box-shadow: 0 4px 0 var(--card-bevel), 0 0 12px rgba(217, 155, 38, 0.4); }
-  50% { box-shadow: 0 4px 0 var(--card-bevel), 0 0 22px rgba(217, 155, 38, 0.7); }
-}
-
-.game-card-icon-well {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: #F7F3EC;
-  border: 1px solid rgba(70, 55, 40, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: inset 0 2px 4px rgba(60, 50, 40, 0.06);
-  margin: auto 0;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.game-card:hover .game-card-icon-well {
-  transform: scale(1.08);
-}
-
-.game-card-icon {
-  font-size: 32px;
-  filter: drop-shadow(0 2px 5px rgba(60, 50, 40, 0.15));
-}
-
-.game-card.selected-pass .game-card-icon-well {
-  animation: card-bounce 0.8s infinite ease-in-out;
-}
-
-@keyframes card-bounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.18); }
-}
-
-/* ==========================================================================
-   TACTILE "SET!" SLAP PILE TARGET (Wax Seal & Weighted Slam Target)
-   ========================================================================== */
-#centerSlapPileBtn {
-  width: 108px !important;
-  height: 108px !important;
-  border-radius: 50% !important;
-  background: radial-gradient(circle at 35% 28%, #D86338 0%, #B84720 55%, #8C3110 100%) !important;
-  border: 4px solid #FAF6F0 !important;
-  box-shadow: 0 8px 0 #6B2309, 0 16px 28px rgba(107, 35, 9, 0.35), inset 0 3px 2px rgba(255, 255, 255, 0.35) !important;
-  color: #FFFFFF !important;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s;
-  user-select: none;
-}
-
-#centerSlapPileBtn:hover {
-  transform: scale(1.06);
-  box-shadow: 0 10px 0 #6B2309, 0 20px 34px rgba(107, 35, 9, 0.45) !important;
-}
-
-#centerSlapPileBtn:active {
-  transform: translateY(5px) scale(0.92);
-  box-shadow: 0 2px 0 #6B2309, 0 4px 10px rgba(107, 35, 9, 0.3) !important;
-}
-
-#centerSlapPileBtn .slap-hand-icon {
-  font-size: 32px;
-  line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
-  color: #FFFFFF !important;
-}
-
-#centerSlapPileBtn span.font-outfit {
-  color: #FFFFFF !important;
-  font-size: 17px !important;
-  letter-spacing: 0.15em;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-#centerSlapPileBtn span.uppercase {
-  color: #FCE8E2 !important;
-  font-size: 8px !important;
-  letter-spacing: 0.12em;
-}
-
-/* Pulsing Slap Rush when 4 matching cards ready */
-@keyframes slap-heartbeat {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 14px rgba(200, 90, 50, 0.6)); }
-  15% { transform: scale(1.14); filter: drop-shadow(0 0 26px rgba(200, 90, 50, 0.95)); }
-  30% { transform: scale(1.06); }
-  45% { transform: scale(1.22); filter: drop-shadow(0 0 34px rgba(217, 155, 38, 1)); }
-}
-
-.slap-ready-frenzy {
-  animation: slap-heartbeat 0.7s infinite ease-in-out !important;
-}
-
-/* ==========================================================================
-   FLOATING DOPAMINE STICKERS & SPARKS
-   ========================================================================== */
-.praise-sticker {
-  position: absolute;
-  pointer-events: none;
-  font-family: 'Outfit', sans-serif;
-  font-weight: 900;
-  font-size: 13px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: #FAF6F0;
-  border: 2px solid #D99B26;
-  color: #2D5A43;
-  box-shadow: 0 4px 14px rgba(70, 55, 40, 0.16);
-  z-index: 100;
-  animation: sticker-pop 1.5s forwards cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes sticker-pop {
-  0% { transform: translateY(0) scale(0.5); opacity: 0; }
-  20% { transform: translateY(-15px) scale(1.15); opacity: 1; }
-  75% { transform: translateY(-40px) scale(1); opacity: 0.95; }
-  100% { transform: translateY(-65px) scale(0.85); opacity: 0; }
-}
-
-.sparkle-burst {
-  position: absolute;
-  pointer-events: none;
-  font-size: 32px;
-  z-index: 100;
-  animation: sparkle-fade 1.6s forwards cubic-bezier(0.1, 0.8, 0.3, 1);
-}
-
-@keyframes sparkle-fade {
-  0% { transform: scale(0.4) rotate(-15deg); opacity: 0; }
-  25% { transform: scale(1.35) rotate(5deg); opacity: 1; }
-  80% { transform: translateY(-50px) scale(1.1); opacity: 0.8; }
-  100% { transform: translateY(-90px) scale(0.85); opacity: 0; }
+  transform: scale(0.96);
 }
 
 /* Animations */
 @keyframes pulse-ring {
-  0%, 100% { transform: scale(1); opacity: 0.85; }
-  50% { transform: scale(1.04); opacity: 1; }
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
 }
 .anim-pulse {
   animation: pulse-ring 2.5s infinite ease-in-out;
@@ -432,7 +195,59 @@ body {
   to { transform: rotate(360deg); }
 }
 .anim-spin-slow {
-  animation: rotate-slow 24s linear infinite;
+  animation: rotate-slow 18s linear infinite;
+}
+
+@keyframes card-pass-anim {
+  0% { transform: translate(-60px, -40px) scale(0.6) rotate(-20deg); opacity: 0; }
+  30% { opacity: 1; }
+  80% { transform: translate(30px, 20px) scale(0.9) rotate(5deg); opacity: 0.9; }
+  100% { transform: translate(60px, 40px) scale(1) rotate(0deg); opacity: 0; }
+}
+.anim-card-flight {
+  animation: card-pass-anim 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+/* Playing Card Component */
+.game-card {
+  height: 124px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid rgba(45, 90, 61, 0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 6px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, box-shadow 0.2s;
+  user-select: none;
+  box-shadow: 0 2px 6px rgba(45, 90, 61, 0.06);
+}
+.game-card:hover {
+  transform: translateY(-4px);
+}
+.game-card.selected-pass {
+  transform: translateY(-12px);
+  border: 2px solid #2d5a3d;
+  box-shadow: 0 8px 24px rgba(45, 90, 61, 0.30);
+  background: linear-gradient(180deg, #ffffff 0%, #f0ebe0 100%);
+}
+.game-card.is-matching {
+  border-color: rgba(224, 120, 86, 0.5);
+}
+.game-card-icon {
+  font-size: 32px;
+  filter: drop-shadow(0 1px 3px rgba(45, 90, 61, 0.15));
+  margin: auto 0;
+}
+.game-card.selected-pass .game-card-icon {
+  animation: card-bounce 0.8s infinite ease-in-out;
+}
+@keyframes card-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
 }
 
 /* Floating Emoji Reactions */
@@ -453,9 +268,8 @@ body {
 /* Confetti particles for victory */
 .confetti-particle {
   position: absolute;
-  width: 10px;
-  height: 10px;
-  border-radius: 3px;
+  width: 8px;
+  height: 8px;
   pointer-events: none;
   animation: confetti-fall 2.5s forwards linear;
 }
@@ -464,7 +278,7 @@ body {
   100% { transform: translateY(500px) rotate(720deg); opacity: 0; }
 }
 
-/* Utility Scrollbars */
+/* Scrollbars */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -472,3 +286,65 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Slap Frenzy Emergency Beacon */
+@keyframes slap-strobe {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.7), 0 0 50px rgba(45, 90, 61, 0.4);
+    border-color: #ef4444;
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(45, 90, 61, 0.6), 0 0 70px rgba(239, 68, 68, 0.5);
+    border-color: #2d5a3d;
+  }
+}
+
+.center-slap-frenzy {
+  animation: slap-strobe 0.4s infinite alternate ease-in-out;
+}
+
+/* Arena Size Toggle Buttons */
+.player-count-btn {
+  user-select: none;
+}
+.player-count-btn:active {
+  transform: scale(0.94);
+}
+
+/* Avatar Picker Uniform Styling */
+.avatar-option {
+  position: relative;
+  transition: transform 0.15s ease, opacity 0.2s ease;
+}
+
+.avatar-option .avatar-box {
+  background-color: var(--surface-high);
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.avatar-option:not(.active-avatar) {
+  opacity: 0.65;
+}
+
+.avatar-option:not(.active-avatar):hover {
+  opacity: 0.95;
+}
+
+.avatar-option.active-avatar {
+  opacity: 1;
+}
+
+.avatar-option.active-avatar .avatar-box {
+  border-color: var(--primary-neon) !important;
+  box-shadow: 0 0 0 3px rgba(45, 90, 61, 0.2), 0 4px 10px rgba(45, 90, 61, 0.12) !important;
+  transform: translateY(-2px);
+  background-color: var(--surface-container) !important;
+}
+
+.avatar-option.active-avatar .avatar-label {
+  color: var(--primary-neon) !important;
+  font-weight: 800;
+}
+

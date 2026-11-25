@@ -2,7 +2,7 @@
 (function() {
   'use strict';
 
-  // --- TACTILE CARD AUDIO SYNTHESIZER ---
+  // --- AUDIO SYNTHESIZER (Web Audio API - Zero External Assets) ---
   const AudioEngine = (function() {
     let ctx = null;
     let enabled = true;
@@ -16,115 +16,21 @@
       }
     }
 
-    // Satisfying Acoustic Hollow Wood Pop (Tactile Card Tap)
-    function playWoodPop(pitch = 560, duration = 0.07, vol = 0.28) {
+    function playTone(freq, type, duration, gainValue = 0.15) {
       if (!enabled) return;
       init();
       if (!ctx) return;
       try {
-        const now = ctx.currentTime;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        const filter = ctx.createBiquadFilter();
-
-        filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(800, now);
-        filter.Q.setValueAtTime(3.5, now);
-
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(pitch, now);
-        osc.frequency.exponentialRampToValueAtTime(140, now + duration);
-
-        gain.gain.setValueAtTime(vol, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-        osc.connect(filter);
-        filter.connect(gain);
-        gain.connect(ctx.destination);
-
-        osc.start(now);
-        osc.stop(now + duration);
-      } catch (e) {}
-    }
-
-    // Resonant Kalimba Bell Chime (Micro-Dopamine Reward)
-    function playKalimba(freq = 523.25, duration = 0.45, vol = 0.25) {
-      if (!enabled) return;
-      init();
-      if (!ctx) return;
-      try {
-        const now = ctx.currentTime;
-        // Fundamental tone
-        const osc1 = ctx.createOscillator();
-        const gain1 = ctx.createGain();
-        osc1.type = 'sine';
-        osc1.frequency.setValueAtTime(freq, now);
-        gain1.gain.setValueAtTime(vol, now);
-        gain1.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-        // Overtone chime (metallic bell ring)
-        const osc2 = ctx.createOscillator();
-        const gain2 = ctx.createGain();
-        osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(freq * 2.76, now);
-        gain2.gain.setValueAtTime(vol * 0.4, now);
-        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-
-        osc1.connect(gain1);
-        gain1.connect(ctx.destination);
-        osc2.connect(gain2);
-        gain2.connect(ctx.destination);
-
-        osc1.start(now);
-        osc2.start(now);
-        osc1.stop(now + duration);
-        osc2.stop(now + 0.12);
-      } catch (e) {}
-    }
-
-    // Heavy Card Table Slam (Weighted tactile impact)
-    function playCardSlam() {
-      if (!enabled) return;
-      init();
-      if (!ctx) return;
-      try {
-        const now = ctx.currentTime;
-        // Deep sub-bass thud
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(220, now);
-        osc.frequency.exponentialRampToValueAtTime(35, now + 0.22);
-        gain.gain.setValueAtTime(0.55, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(gainValue, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
         osc.connect(gain);
         gain.connect(ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.22);
-
-        // Crisp snap crack
-        playWoodPop(760, 0.05, 0.4);
-      } catch (e) {}
-    }
-
-    // High-energy Sparkle Zing Chime
-    function playSparkleChime() {
-      if (!enabled) return;
-      init();
-      if (!ctx) return;
-      try {
-        const now = ctx.currentTime;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, now);
-        osc.frequency.exponentialRampToValueAtTime(1480, now + 0.12);
-        gain.gain.setValueAtTime(0.25, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.18);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
       } catch (e) {}
     }
 
@@ -135,54 +41,57 @@
       },
       isEnabled() { return enabled; },
       cardSelect() {
-        playWoodPop(580, 0.06, 0.3);
+        playTone(520, 'sine', 0.08, 0.2);
       },
       cardPass() {
-        playWoodPop(480, 0.08, 0.28);
-        setTimeout(() => playKalimba(659.25, 0.2, 0.15), 50); // E5 subtle swoosh
+        if (!enabled) return;
+        init();
+        if (!ctx) return;
+        try {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(300, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(700, ctx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.15);
+        } catch (e) {}
       },
-      cardReceive(matchCount = 1) {
-        if (matchCount >= 3) {
-          playKalimba(783.99, 0.45, 0.3); // G5 chime
-          setTimeout(() => playKalimba(1046.50, 0.4, 0.25), 80); // High C6 sparkle!
-        } else if (matchCount === 2) {
-          playKalimba(587.33, 0.35, 0.22); // D5 cozy pair
-        } else {
-          playWoodPop(620, 0.06, 0.25);
-        }
-      },
-      matchChime(count) {
-        if (count >= 4) {
-          playKalimba(1046.50, 0.5, 0.35);
-          playSparkleChime();
-        } else if (count === 3) {
-          playKalimba(783.99, 0.4, 0.28);
-        } else if (count === 2) {
-          playKalimba(587.33, 0.3, 0.2);
-        }
+      cardReceive() {
+        playTone(650, 'sine', 0.12, 0.18);
+        setTimeout(() => playTone(880, 'sine', 0.15, 0.2), 70);
       },
       turnAlert() {
-        playKalimba(659.25, 0.25, 0.25);
-        setTimeout(() => playKalimba(880, 0.3, 0.3), 100);
+        playTone(440, 'sine', 0.1, 0.25);
+        setTimeout(() => playTone(660, 'sine', 0.15, 0.3), 110);
       },
       victory() {
         if (!enabled) return;
-        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51]; // Ascending cascade
-        notes.forEach((note, i) => {
-          setTimeout(() => playKalimba(note, 0.5, 0.3), i * 100);
+        init();
+        const chords = [523.25, 659.25, 783.99, 1046.50]; // C Major arpeggio
+        chords.forEach((note, i) => {
+          setTimeout(() => playTone(note, 'triangle', 0.4, 0.25), i * 110);
         });
-        setTimeout(() => playSparkleChime(), 420);
       },
       slap() {
-        playCardSlam();
-        playSparkleChime();
+        playTone(180, 'square', 0.12, 0.35);
       },
       slapAlert() {
-        playKalimba(880, 0.2, 0.35);
-        setTimeout(() => playKalimba(1046.50, 0.25, 0.4), 90);
+        if (!enabled) return;
+        init();
+        if (!ctx) return;
+        try {
+          for (let i = 0; i < 4; i++) {
+            setTimeout(() => playTone(780 + i * 110, 'sawtooth', 0.12, 0.28), i * 85);
+          }
+        } catch (e) {}
       },
       error() {
-        playWoodPop(180, 0.15, 0.3);
+        playTone(150, 'sawtooth', 0.2, 0.2);
       }
     };
   })();
@@ -196,16 +105,16 @@
 
   // --- PLAYER PROFILE & AVATAR POOL ---
   const DEFAULT_AVATARS = {
-    fox: { name: 'Rustic Fox', icon: '🦊' },
-    cat: { name: 'Amber Cat', icon: '🐱' },
-    bot: { name: 'Clay Bot', icon: '🤖' },
-    astro: { name: 'Woodland Scout', icon: '🧑‍🚀' },
+    fox: { name: 'Cyber Fox', icon: '🦊' },
+    cat: { name: 'Neon Cat', icon: '🐱' },
+    bot: { name: 'Pixel Bot', icon: '🤖' },
+    astro: { name: 'Astro Kid', icon: '🧑‍🚀' },
     ninja: { name: 'Shadow Ninja', icon: '🥷' },
-    panda: { name: 'Bamboo Panda', icon: '🐼' },
-    wolf: { name: 'Timber Wolf', icon: '🐺' },
-    viper: { name: 'Grass Viper', icon: '🐍' },
-    bear: { name: 'Grizzly Bear', icon: '🐻' },
-    punk: { name: 'Forest Spirit', icon: '👾' }
+    panda: { name: 'Robo Panda', icon: '🐼' },
+    wolf: { name: 'Quantum Wolf', icon: '🐺' },
+    viper: { name: 'Turbo Viper', icon: '🐍' },
+    bear: { name: 'Cosmo Bear', icon: '🐻' },
+    punk: { name: 'Cyber Punk', icon: '👾' }
   };
 
   const storedId = localStorage.getItem('set_player_id') || `p_${Math.random().toString(36).substr(2, 8)}`;
@@ -472,8 +381,8 @@
     const pingEl = document.getElementById('pingIndicator');
     if (pingEl) {
       pingEl.innerHTML = online 
-        ? `<span class="material-symbols-outlined text-[13px] text-primary" style="color:#2D5A43;">bolt</span> Online`
-        : `<span class="material-symbols-outlined text-[13px] text-secondary" style="color:#C85A32;">cloud_off</span> Reconnecting`;
+        ? `<span class="material-symbols-outlined text-[13px] text-primary" style="color:#2d5a3d;">bolt</span> Online`
+        : `<span class="material-symbols-outlined text-[13px] text-error" style="color:#ffb4ab;">cloud_off</span> Reconnecting`;
     }
   }
 
@@ -486,10 +395,10 @@
     }
     if (badgeContainer) {
       if (streak > 0) {
-        badgeContainer.style.background = 'linear-gradient(90deg, rgba(200, 90, 50, 0.15), rgba(45, 90, 67, 0.15))';
-        badgeContainer.style.borderColor = '#C85A32';
-        badgeContainer.style.color = '#C85A32';
-        badgeContainer.style.boxShadow = '0 2px 8px rgba(200, 90, 50, 0.2)';
+        badgeContainer.style.background = 'linear-gradient(90deg, rgba(255, 77, 109, 0.25), rgba(0, 245, 212, 0.2))';
+        badgeContainer.style.borderColor = '#ff4d6d';
+        badgeContainer.style.color = '#ff4d6d';
+        badgeContainer.style.boxShadow = '0 0 12px rgba(255, 77, 109, 0.4)';
       } else {
         badgeContainer.style.background = '';
         badgeContainer.style.borderColor = '';
@@ -605,14 +514,14 @@
       const btn = document.createElement('button');
       btn.className = `deck-pill flex items-center space-x-2 px-3.5 py-2 rounded-full border flex-shrink-0 transition-all cursor-pointer ${
         isSelected 
-          ? 'bg-primary border-2 border-primary text-white font-bold shadow-sm' 
-          : 'bg-surface-container border-stone-subtle text-on-surface hover:border-primary/60'
+          ? 'bg-tertiary-container/30 border-2 border-tertiary-container text-white glow-coral font-bold' 
+          : 'bg-surface-high border-outline-variant/60 text-on-surface hover:border-primary-neon/60'
       }`;
-      btn.style.borderColor = isSelected ? '#2D5A43' : '';
+      btn.style.borderColor = isSelected ? '#2d5a3d' : '';
       btn.innerHTML = `
         <span class="text-base">${cat.icon || '🃏'}</span>
         <span class="text-xs font-semibold">${key}</span>
-        ${isSelected ? '<span class="w-1.5 h-1.5 rounded-full" style="background:#FFFFFF;"></span>' : ''}
+        ${isSelected ? '<span class="w-1.5 h-1.5 rounded-full" style="background:#2d5a3d;"></span>' : ''}
       `;
       btn.onclick = () => {
         state.selectedCategory = key;
@@ -625,7 +534,7 @@
 
     // Custom Workshop Button
     const customBtn = document.createElement('button');
-    customBtn.className = 'deck-pill flex items-center space-x-2 px-3.5 py-2 rounded-full bg-surface-container border border-secondary/40 text-secondary hover:bg-secondary/10 transition-all flex-shrink-0 cursor-pointer';
+    customBtn.className = 'deck-pill flex items-center space-x-2 px-3.5 py-2 rounded-full bg-surface-high border border-secondary/60 text-secondary hover:bg-secondary/20 transition-all flex-shrink-0 cursor-pointer';
     customBtn.innerHTML = `
       <span class="text-base">✨</span>
       <span class="text-xs font-bold">+ New Deck</span>
@@ -645,17 +554,17 @@
     previewBox.innerHTML = `
       <div class="flex items-center space-x-2.5">
         <div class="flex -space-x-2">
-          <span class="w-7 h-9 rounded bg-white border border-stone-subtle flex items-center justify-center text-xs shadow-sm">${firstItem.icon}</span>
-          <span class="w-7 h-9 rounded bg-white border border-stone-subtle flex items-center justify-center text-xs shadow-sm">${firstItem.icon}</span>
-          <span class="w-7 h-9 rounded bg-white border border-stone-subtle flex items-center justify-center text-xs shadow-sm">${firstItem.icon}</span>
-          <span class="w-7 h-9 rounded bg-white border-2 border-primary flex items-center justify-center text-xs shadow-sm font-bold">${firstItem.icon}</span>
+          <span class="w-7 h-9 rounded bg-surface-high border border-white/20 flex items-center justify-center text-xs shadow">${firstItem.icon}</span>
+          <span class="w-7 h-9 rounded bg-surface-high border border-white/20 flex items-center justify-center text-xs shadow">${firstItem.icon}</span>
+          <span class="w-7 h-9 rounded bg-surface-high border border-white/20 flex items-center justify-center text-xs shadow">${firstItem.icon}</span>
+          <span class="w-7 h-9 rounded bg-surface-high border-2 border-primary-neon flex items-center justify-center text-xs shadow glow-cyan-sm font-bold">${firstItem.icon}</span>
         </div>
         <div>
           <p class="text-xs font-bold text-on-surface">${firstItem.name} Quartet (4 Cards)</p>
           <p class="text-[11px] text-muted">${cat.items.length} Unique Items in Deck</p>
         </div>
       </div>
-      <div class="px-2.5 py-1 rounded-lg bg-surface-high text-primary font-bold text-[10px]" style="color:#2D5A43;">
+      <div class="px-2 py-1 rounded bg-surface-highest text-primary-neon font-bold text-[10px]" style="color:#2d5a3d;">
         ${state.selectedCategory.toUpperCase()} DECK
       </div>
     `;
@@ -675,27 +584,27 @@
     }
 
     container.innerHTML = rooms.map(r => `
-      <div class="glass-panel p-3 flex items-center justify-between transition-colors hover:border-primary/40">
+      <div class="glass-panel p-3 flex items-center justify-between transition-colors hover:border-primary-neon/40">
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-surface-high flex flex-col items-center justify-center border border-stone-subtle">
+          <div class="w-10 h-10 rounded-xl bg-surface-high flex flex-col items-center justify-center border border-white/10">
             <span class="text-[10px] text-muted font-mono">#${r.id}</span>
             <span class="text-xs">${r.categoryIcon || '🍓'}</span>
           </div>
           <div>
             <div class="flex items-center space-x-1.5">
               <span class="text-xs font-bold text-on-surface">${r.name}</span>
-              ${r.status === 'playing' ? '<span class="w-1.5 h-1.5 rounded-full bg-secondary" title="In Game"></span>' : '<span class="w-1.5 h-1.5 rounded-full" style="background:#2D5A43;" title="Open"></span>'}
+              ${r.status === 'playing' ? '<span class="w-1.5 h-1.5 rounded-full bg-error" title="In Game"></span>' : '<span class="w-1.5 h-1.5 rounded-full" style="background:#2d5a3d;" title="Open"></span>'}
             </div>
             <p class="text-[11px] text-muted">${r.category} • ${r.status === 'playing' ? 'Active Match' : 'Waiting for Players'}</p>
           </div>
         </div>
         <div class="flex items-center space-x-3">
           <div class="text-right">
-            <span class="text-xs font-bold" style="color:#2D5A43;">${r.playerCount}/${r.maxPlayers}</span>
+            <span class="text-xs font-bold" style="color:#2d5a3d;">${r.playerCount}/${r.maxPlayers}</span>
             <span class="block text-[9px] text-muted">Plrs</span>
           </div>
           <button class="px-3.5 py-1.5 rounded-lg font-bold text-xs transition-all active:scale-95 cursor-pointer" 
-                  style="background:#2D5A43; color:#FFFFFF; box-shadow:0 2px 8px rgba(45,90,67,0.3);"
+                  style="background:#2d5a3d; color:#f5f0e8; box-shadow:0 0 12px rgba(45,90,61,0.35);"
                   onclick="window.setApp.joinRoom('${r.id}')">
             ${r.status === 'playing' ? 'WATCH' : 'JOIN'}
           </button>
@@ -762,19 +671,19 @@
       const turnBadge = document.getElementById('turnActionPill');
       if (turnBadge) {
         if (isMyTurn) {
-          turnBadge.className = 'px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm';
-          turnBadge.style.background = 'linear-gradient(90deg, #2D5A43, #3B6F54)';
-          turnBadge.style.color = '#FFFFFF';
+          turnBadge.className = 'px-3 py-1 rounded-full flex items-center gap-1.5 glow-cyan';
+          turnBadge.style.background = 'linear-gradient(90deg, #2d5a3d, #3d7350)';
+          turnBadge.style.color = '#f5f0e8';
           turnBadge.innerHTML = `
             <span class="text-xs font-black animate-bounce">⚡ YOUR TURN</span>
-            <span class="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-white text-primary font-mono font-bold">PASS 1</span>
+            <span class="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-surface-lowest text-primary-neon font-mono">PASS 1</span>
           `;
         } else {
-          turnBadge.className = 'px-3 py-1 rounded-full flex items-center gap-1.5 bg-surface-high border border-stone-subtle';
+          turnBadge.className = 'px-3 py-1 rounded-full flex items-center gap-1.5 bg-surface-high border border-white/10';
           turnBadge.style.background = '';
           turnBadge.style.color = 'var(--text-main)';
           turnBadge.innerHTML = `
-            <span class="w-2 h-2 rounded-full animate-ping" style="background:${isTurnBot ? '#C85A32' : '#2D5A43'};"></span>
+            <span class="w-2 h-2 rounded-full animate-ping" style="background:${isTurnBot ? '#2d5a3d' : '#e07856'};"></span>
             <span class="text-xs font-semibold tracking-wide">${currentTurnName.toUpperCase()} ${isTurnBot ? '🤖 THINKING...' : "'S TURN"}</span>
           `;
         }
@@ -787,7 +696,7 @@
           tickerText.innerHTML = `⏳ Waiting for players (${room.players.length}/${room.maxPlayers})...`;
         } else if (isMyTurn) {
           const selCard = myPlayer?.hand?.find(c => c.id === state.selectedCardId) || oddCard;
-          tickerText.innerHTML = `👉 <b style="color:#2D5A43;">YOUR TURN!</b> Pass <b>${selCard ? selCard.name : 'odd card'}</b> ➔ Tap card or hit Pass!`;
+          tickerText.innerHTML = `👉 <b class="text-primary-neon">YOUR TURN!</b> Pass <b>${selCard ? selCard.name : 'odd card'}</b> ➔ Tap card or hit Pass!`;
         } else {
           tickerText.innerHTML = isTurnBot 
             ? `🤖 <b>${currentTurnName}</b> is choosing a card to pass...` 
@@ -809,8 +718,8 @@
       const dirEl = document.getElementById('directionBadge');
       if (dirEl) {
         dirEl.innerHTML = `
-          <span class="material-symbols-outlined text-[13px] animate-spin" style="color:#2D5A43; animation-duration: 6s;">sync</span>
-          <span class="text-[10px] font-bold tracking-wider uppercase" style="color:#2D5A43;">${(room.passDirection || 'clockwise').toUpperCase()} PASS</span>
+          <span class="material-symbols-outlined text-[13px] animate-spin" style="color:#2d5a3d; animation-duration: 4s;">sync</span>
+          <span class="text-[10px] font-bold tracking-wider uppercase" style="color:#2d5a3d;">${(room.passDirection || 'clockwise').toUpperCase()} PASS</span>
         `;
       }
 
@@ -861,19 +770,19 @@
 
       seat.innerHTML = `
         <div class="relative">
-          <div class="${avatarSize} rounded-full p-[2px] transition-all ${isTurn ? 'ring-2 ring-primary shadow-md' : 'bg-white border border-stone-subtle'}"
-               style="${isTurn ? 'background: linear-gradient(135deg, #2D5A43, #D99B26);' : ''}">
-            <div class="w-full h-full rounded-full bg-white flex items-center justify-center shadow-inner">
+          <div class="${avatarSize} rounded-full p-[2px] transition-all ${isTurn ? 'glow-cyan ring-2 ring-primary-neon' : 'bg-surface-high border border-white/20'}"
+               style="${isTurn ? 'background: linear-gradient(135deg, #2d5a3d, #e07856);' : ''}">
+            <div class="w-full h-full rounded-full bg-surface-high flex items-center justify-center">
               ${avatarIcon}
             </div>
           </div>
-          <div class="absolute -bottom-1 -right-1 bg-surface-container border border-stone-subtle px-1 py-0.2 rounded-full flex items-center gap-0.5 text-[9px] font-bold shadow-sm">
+          <div class="absolute -bottom-1 -right-1 bg-surface-low border border-white/20 px-1 py-0.2 rounded-full flex items-center gap-0.5 text-[9px] font-bold">
             <span class="material-symbols-outlined text-[10px] text-secondary">style</span>
             <span>${p.cardCount || 4}</span>
           </div>
         </div>
         <span class="${nameWidth} font-semibold text-on-surface mt-0.5 truncate text-center">${p.name}</span>
-        <span class="text-[8px] font-mono px-1 rounded ${isTurn ? 'text-primary bg-primary-light font-bold' : 'text-muted'}">
+        <span class="text-[8px] font-mono px-1 rounded ${isTurn ? 'text-primary-neon bg-primary-neon/10 font-bold animate-pulse' : 'text-muted'}">
           ${isTurn ? (p.isBot ? 'Thinking 🧠' : 'Turn ⚡') : (p.isBot ? 'Bot 🤖' : 'Ready')}
         </span>
       `;
@@ -940,39 +849,30 @@
 
     hand.forEach((card, index) => {
       const isSelected = state.selectedCardId === card.id;
-      const count = counts[card.name] || 1;
-      const isMatching = count > 1;
-      const isTriple = count === 3;
-      const isQuad = count === 4;
+      const isMatching = counts[card.name] > 1;
 
       const cardEl = document.createElement('div');
-      cardEl.className = `game-card ${isSelected ? 'selected-pass' : ''} ${isMatching ? 'is-matching' : ''} ${isTriple ? 'is-triple' : ''} ${isMyTurn ? 'cursor-pointer' : ''}`;
+      cardEl.className = `game-card ${isSelected ? 'selected-pass' : ''} ${isMatching ? 'is-matching' : ''} ${isMyTurn ? 'ring-1 ring-primary-neon/40 cursor-pointer' : ''}`;
       cardEl.innerHTML = `
-        ${isSelected ? '<div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase shadow-md flex items-center gap-1" style="background:#C85A32; color:#FFFFFF;">⚡ PASS THIS</div>' : ''}
-        <div class="w-full flex justify-between items-center text-[10px] px-1 text-muted font-bold font-mono">
-          <span>#${index + 1}</span>
-          <span class="text-xs">✦</span>
+        ${isSelected ? '<div class="absolute -top-3 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase glow-cyan-sm" style="background:#2d5a3d; color:#f5f0e8;">PASS ➔</div>' : ''}
+        <div class="w-full flex justify-between items-center text-[10px]">
+          <span class="text-muted font-bold">#${index + 1}</span>
+          <span class="text-primary-neon font-mono">${card.icon || '🃏'}</span>
         </div>
-        <div class="game-card-icon-well">
-          <span class="game-card-icon">${card.icon || '🃏'}</span>
-        </div>
-        <div class="w-full text-center pb-0.5">
-          <span class="text-[11px] font-extrabold block leading-tight text-on-surface truncate">${card.name}</span>
-          <span class="text-[8px] font-black uppercase tracking-wider mt-0.5 block ${isQuad ? 'text-primary' : (isTriple ? 'text-tertiary' : (isMatching ? 'text-primary' : 'text-muted'))}">
-            ${isQuad ? 'SET! 👑' : (isTriple ? '3x (1 MORE!) ✨' : (isMatching ? '2x PAIR ✨' : '1x ODD'))}
+        <div class="game-card-icon">${card.icon || '🃏'}</div>
+        <div class="w-full text-center">
+          <span class="text-[11px] font-bold block leading-none text-on-surface truncate">${card.name}</span>
+          <span class="text-[8px] font-bold uppercase tracking-wider ${isMatching ? 'text-primary-neon' : 'text-muted'}">
+            ${counts[card.name] === 4 ? 'SET! 🔥' : (isMatching ? `${counts[card.name]}x MATCH` : 'ODD')}
           </span>
         </div>
       `;
 
       cardEl.onclick = () => {
         AudioEngine.cardSelect();
-        if (count > 1) {
-          AudioEngine.matchChime(count);
-        }
         vibrate([30]);
         if (isMyTurn && state.selectedCardId === card.id) {
           // Double-tap or second tap immediately passes the card!
-          triggerPraiseSticker('QUICK PASS! ⚡', cardEl);
           passSelectedCard();
         } else {
           state.selectedCardId = card.id;
@@ -999,7 +899,7 @@
       if ((myPlayer?.hand || []).length === 4) {
         // Pure 4-of-a-kind in hand! Ready to slap!
         btn.disabled = false;
-        btn.className = 'w-full py-3.5 btn-primary text-xs font-black rounded-xl cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2 ring-2 ring-secondary animate-bounce';
+        btn.className = 'w-full py-3.5 btn-primary text-xs font-black rounded-xl glow-cyan cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2 ring-2 ring-primary-neon animate-bounce';
         btn.innerHTML = `
           <span class="material-symbols-outlined text-[20px]">pan_tool</span>
           <span>🔥 SET READY! SLAP CENTER PILE NOW! 🔥</span>
@@ -1012,7 +912,7 @@
         // Holding 4 matching + 1 odd card: pass the odd card and immediately slap!
         const oddCard = myPlayer?.hand?.find(c => counts[c.name] === 1) || myPlayer?.hand?.[0];
         btn.disabled = false;
-        btn.className = 'w-full py-3.5 btn-primary text-xs font-black rounded-xl cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2 ring-2 ring-secondary';
+        btn.className = 'w-full py-3.5 btn-primary text-xs font-black rounded-xl glow-cyan cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2 ring-2 ring-primary-neon';
         btn.innerHTML = `
           <span class="material-symbols-outlined text-[20px]">send</span>
           <span>PASS ${oddCard ? oddCard.name.toUpperCase() : 'ODD'} & SLAP SET! ➔</span>
@@ -1028,7 +928,7 @@
 
     if (!isMyTurn) {
       btn.disabled = true;
-      btn.className = 'w-full py-3 bg-surface-high border border-stone-subtle text-muted font-bold rounded-xl cursor-not-allowed opacity-60 flex items-center justify-center gap-2 shadow-sm';
+      btn.className = 'w-full py-3 bg-surface-high text-muted font-bold rounded-xl cursor-not-allowed opacity-60 flex items-center justify-center gap-2';
       btn.innerHTML = `
         <span class="material-symbols-outlined text-[18px]">hourglass_empty</span>
         <span>WAITING FOR OPPONENT'S TURN...</span>
@@ -1037,13 +937,22 @@
     }
 
     const selCard = myPlayer?.hand?.find(c => c.id === state.selectedCardId) || myPlayer?.hand?.[0];
+    if (!selCard) {
+      btn.disabled = true;
+      btn.className = 'w-full py-3 bg-surface-high text-muted font-bold rounded-xl cursor-not-allowed opacity-60 flex items-center justify-center gap-2';
+      btn.innerHTML = `
+        <span class="material-symbols-outlined text-[18px]">hourglass_empty</span>
+        <span>NO CARDS TO PASS</span>
+      `;
+      return;
+    }
 
     btn.disabled = false;
-    btn.className = 'w-full py-3.5 btn-primary text-xs font-black rounded-xl cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2';
+    btn.className = 'w-full py-3.5 btn-primary text-xs font-black rounded-xl glow-cyan cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2';
     btn.innerHTML = `
       <span class="material-symbols-outlined text-[20px] animate-bounce">send</span>
       <span>PASS ${selCard ? selCard.name.toUpperCase() : 'CARD'} ${selCard?.icon || ''} ➔</span>
-      <span class="text-[9px] px-1.5 py-0.5 rounded bg-white/20 text-white font-mono font-black">1-TAP PASS</span>
+      <span class="text-[9px] px-1.5 py-0.5 rounded bg-surface-lowest text-primary-neon font-mono font-black">1-TAP PASS</span>
     `;
     btn.onclick = () => {
       passSelectedCard();
@@ -1052,7 +961,11 @@
 
   function renderHandProgressBar(hand) {
     const container = document.getElementById('matchProgressContainer');
-    if (!container || !hand || hand.length === 0) return;
+    if (!container) return;
+    if (!hand || hand.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
 
     const counts = {};
     let maxCount = 0;
@@ -1075,19 +988,19 @@
           <span class="text-base">${maxItem ? maxItem.icon : '🃏'}</span>
           <span class="text-xs font-bold text-on-surface">${maxCount} of 4 Matching (${maxItem ? maxItem.name : ''})</span>
         </div>
-        <span class="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border border-primary/30" style="background:#E8F0EB; color:#2D5A43;">
+        <span class="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border border-primary-neon/40 text-primary-neon" style="background:#f5f0e8; color:#2d5a3d;">
           ${percent}% SET READY
         </span>
       </div>
-      <div class="w-full h-2.5 rounded-full bg-surface-high p-0.5 border border-stone-subtle relative overflow-hidden">
-        <div class="h-full rounded-full transition-all duration-300" style="width: ${percent}%; background: linear-gradient(90deg, #2D5A43, #D99B26); box-shadow: 0 1px 6px rgba(45,90,67,0.25);"></div>
+      <div class="w-full h-2.5 rounded-full bg-surface-high p-0.5 border border-white/10 relative overflow-hidden">
+        <div class="h-full rounded-full transition-all duration-300" style="width: ${percent}%; background: linear-gradient(90deg, #2d5a3d, #e07856); box-shadow: 0 0 12px rgba(45,90,61,0.35);"></div>
       </div>
       <div class="flex justify-between items-center mt-1.5 text-[10px]">
-        <span class="font-bold" style="color:#C85A32;">
+        <span class="font-medium" style="color:#2b2b2b;">
           ${maxCount === 4 ? '🔥 4-OF-A-KIND COMPLETE! SLAP SET! 🔥' : `Need ${remaining} more ${maxItem ? maxItem.name : ''} to slam SET!`}
         </span>
         <span class="text-muted flex items-center gap-1 font-mono">
-          <span class="material-symbols-outlined text-[12px] text-primary">speed</span> Instant Slap
+          <span class="material-symbols-outlined text-[12px] text-primary-neon">speed</span> Instant Slap
         </span>
       </div>
     `;
@@ -1221,45 +1134,6 @@
     AudioEngine.slap();
   }
 
-  function triggerPraiseSticker(text, targetEl) {
-    const container = document.getElementById('floatingReactionsContainer');
-    if (!container) return;
-    const sticker = document.createElement('div');
-    sticker.className = 'praise-sticker';
-    if (targetEl) {
-      const rect = targetEl.getBoundingClientRect();
-      sticker.style.left = `${rect.left + rect.width / 2 - 40}px`;
-      sticker.style.top = `${rect.top - 12}px`;
-    } else {
-      sticker.style.left = `${35 + Math.random() * 30}%`;
-      sticker.style.bottom = '180px';
-    }
-    sticker.textContent = text;
-    container.appendChild(sticker);
-    setTimeout(() => {
-      if (sticker.parentNode) sticker.parentNode.removeChild(sticker);
-    }, 1500);
-  }
-
-  function triggerSparkleBurst(x, y) {
-    const container = document.getElementById('floatingReactionsContainer');
-    if (!container) return;
-    const icons = ['💥', '✨', '⚡', '⭐', '🔥'];
-    for (let i = 0; i < 3; i++) {
-      const burst = document.createElement('div');
-      burst.className = 'sparkle-burst';
-      const offsetX = (Math.random() - 0.5) * 40;
-      const offsetY = (Math.random() - 0.5) * 30;
-      burst.style.left = `${(x || (window.innerWidth / 2 - 16)) + offsetX}px`;
-      burst.style.top = `${(y || (window.innerHeight / 2 - 16)) + offsetY}px`;
-      burst.textContent = icons[Math.floor(Math.random() * icons.length)];
-      container.appendChild(burst);
-      setTimeout(() => {
-        if (burst.parentNode) burst.parentNode.removeChild(burst);
-      }, 1600);
-    }
-  }
-
   function resetSlapFrenzyUi() {
     state.slapFrenzyActive = false;
     state.frenzyTimers.forEach(clearTimeout);
@@ -1273,12 +1147,12 @@
     if (ring) ring.classList.add('hidden');
     if (tag) {
       tag.classList.add('hidden');
-      tag.textContent = '⚡ SLAP NOW!';
-      tag.className = 'hidden absolute -top-3.5 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-secondary text-white shadow-lg animate-bounce';
+      tag.textContent = '🚨 SLAP NOW!';
+      tag.className = 'hidden absolute -top-3.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-red-600 text-white shadow-lg animate-bounce';
     }
     if (badge) badge.classList.add('hidden');
     if (slapBtn) {
-      slapBtn.classList.remove('slap-ready-frenzy');
+      slapBtn.classList.remove('glow-cyan', 'ring-4', 'ring-red-500', 'animate-pulse');
     }
   }
 
@@ -1286,15 +1160,6 @@
   function slapCenterPile() {
     AudioEngine.slap();
     vibrate([80, 40, 80]);
-
-    const slapBtn = document.getElementById('centerSlapPileBtn');
-    if (slapBtn) {
-      const rect = slapBtn.getBoundingClientRect();
-      triggerSparkleBurst(rect.left + rect.width / 2 - 16, rect.top + rect.height / 2 - 16);
-      triggerPraiseSticker('💥 SLAP!', slapBtn);
-    } else {
-      triggerSparkleBurst();
-    }
 
     if (!state.activeRoom) return;
     const myPlayer = getMyPlayer();
@@ -1592,7 +1457,7 @@
     const container = document.getElementById('confettiContainer');
     if (!container) return;
     container.innerHTML = '';
-    const colors = ['#2D5A43', '#C85A32', '#D99B26', '#3B6F54', '#EAE2D5'];
+    const colors = ['#2d5a3d', '#e07856', '#5b8def', '#3d7350', '#8a8578'];
 
     for (let i = 0; i < 40; i++) {
       const p = document.createElement('div');
@@ -2193,7 +2058,7 @@
   }
 
   // --- INITIALIZATION ---
-  window.addEventListener('DOMContentLoaded', () => {
+  function init() {
     // Connect WebSocket
     connectWebSocket();
 
@@ -2214,6 +2079,18 @@
     }
 
     // Avatar selector elements
+    function updateAvatarSelectionUI() {
+      const current = state.playerAvatar || 'fox';
+      document.querySelectorAll('.avatar-option').forEach(item => {
+        const av = item.getAttribute('data-avatar');
+        if (av === current) {
+          item.classList.add('active-avatar');
+        } else {
+          item.classList.remove('active-avatar');
+        }
+      });
+    }
+
     document.querySelectorAll('.avatar-option').forEach(el => {
       el.onclick = () => {
         const av = el.getAttribute('data-avatar');
@@ -2221,15 +2098,12 @@
         localStorage.setItem('set_player_avatar', av);
         AudioEngine.cardSelect();
         vibrate([20]);
-
-        document.querySelectorAll('.avatar-option').forEach(item => {
-          item.classList.remove('active-avatar');
-          item.classList.add('opacity-75');
-        });
-        el.classList.add('active-avatar');
-        el.classList.remove('opacity-75');
+        updateAvatarSelectionUI();
       };
     });
+
+    // Initialize saved avatar selection on load
+    updateAvatarSelectionUI();
 
     // Pin input auto-focus flow
     const pinBoxes = document.querySelectorAll('.pin-box');
@@ -2256,7 +2130,13 @@
         setTimeout(triggerQuickPlay, 300);
       }
     } catch (e) {}
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 
   // Expose global methods for onclick handlers
   window.setApp = {
@@ -2312,9 +2192,9 @@
       }
       if (btn) {
         if (state.autoPilot) {
-          btn.style.background = '#2D5A43';
-          btn.style.color = '#FFFFFF';
-          btn.style.boxShadow = '0 2px 10px rgba(45,90,67,0.35)';
+          btn.style.background = '#2d5a3d';
+          btn.style.color = '#f5f0e8';
+          btn.style.boxShadow = '0 0 14px rgba(45,90,61,0.35)';
           showToast('🤖 Bot Pilot ON: Playing automatically!', 'success');
           if (state.activeRoom && state.activeRoom.players[state.activeRoom.turn]?.id === state.playerId) {
             passSelectedCard();
