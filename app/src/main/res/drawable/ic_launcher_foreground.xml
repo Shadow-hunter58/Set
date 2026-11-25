@@ -4,7 +4,112 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- Card 1 Shadow (Left Card) -->
     <path
-        android:fillColor="#CCFF00"
-        android:pathData="M38,38h32v32h-32z" />
+        android:fillColor="#33000000"
+        android:pathData="M37,38 L55,34 C56.5,33.7 58,34.7 58.3,36.2 L64,68 C64.3,69.5 63.3,71 61.8,71.3 L44,75.3 C42.5,75.6 41,74.6 40.7,73.1 L35,41.3 C34.7,39.8 35.7,38.3 37,38 Z" />
+
+    <!-- Card 1 (Left Card - Frosted Slate White) -->
+    <path
+        android:fillColor="#E2E8F0"
+        android:pathData="M36,36 L54,32 C55.5,31.7 57,32.7 57.3,34.2 L63,66 C63.3,67.5 62.3,69 60.8,69.3 L43,73.3 C41.5,73.6 40,72.6 39.7,71.1 L34,39.3 C33.7,37.8 34.7,36.3 36,36 Z" />
+    <path
+        android:fillColor="#CBD5E1"
+        android:pathData="M38,39 L52,36 L57,63 L43,66 Z" />
+
+    <!-- Card 2 Shadow (Right Card) -->
+    <path
+        android:fillColor="#4D000000"
+        android:pathData="M54,35 L72,39 C73.5,39.3 74.5,40.8 74.2,42.3 L68.2,74.3 C67.9,75.8 66.4,76.8 64.9,76.5 L47.1,72.5 C45.6,72.2 44.6,70.7 44.9,69.2 L50.9,37.2 C51.2,35.7 52.7,34.7 54,35 Z" />
+
+    <!-- Card 2 (Right Card - Bright Crisp White) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M53,33 L71,37 C72.5,37.3 73.5,38.8 73.2,40.3 L67.2,72.3 C66.9,73.8 65.4,74.8 63.9,74.5 L46.1,70.5 C44.6,70.2 43.6,68.7 43.9,67.2 L49.9,35.2 C50.2,33.7 51.7,32.7 53,33 Z" />
+
+    <!-- Card Suit Accent on Right Card (Small Red Diamond) -->
+    <path
+        android:fillColor="#DC2626"
+        android:pathData="M52,38 L54,41 L52,44 L50,41 Z" />
+    <path
+        android:fillColor="#DC2626"
+        android:pathData="M65,66 L67,69 L65,72 L63,69 Z" />
+
+    <!-- Outer Dynamic Flame -->
+    <path
+        android:fillColor="#EA580C"
+        android:pathData="M54,71
+                          C45,71 40,65 40,57
+                          C40,50 45,46 48,40
+                          C50,43 51,46 53,48
+                          C54,42 56,36 60,33
+                          C59,39 63,44 65,49
+                          C67,52 68,57 68,61
+                          C68,67 62,71 54,71 Z" />
+
+    <!-- Mid Vibrant Flame -->
+    <path
+        android:fillColor="#F97316"
+        android:pathData="M54,68
+                          C48,68 44,63 44,57
+                          C44,52 47,48 50,44
+                          C51,46 52,49 53,50
+                          C54,46 56,41 58,38
+                          C57,43 60,47 62,51
+                          C63,53 64,57 64,60
+                          C64,65 59,68 54,68 Z" />
+
+    <!-- Inner Core Golden Flame -->
+    <path
+        android:fillColor="#FDE047"
+        android:pathData="M54,65
+                          C50,65 47,61 47,57
+                          C47,53 49,50 51,47
+                          C52,49 53,51 54,52
+                          C55,49 56,45 57,43
+                          C57,47 59,50 60,53
+                          C60,54 61,57 61,59
+                          C61,63 58,65 54,65 Z" />
+
+    <!-- Action Sparks (Minimalist Diamonds) -->
+    <!-- Top Left -->
+    <path
+        android:fillColor="#FDE047"
+        android:pathData="M39,34 L40.5,31 L42,34 L40.5,37 Z" />
+    <!-- Top Right -->
+    <path
+        android:fillColor="#FBBF24"
+        android:pathData="M67,31 L68.5,28 L70,31 L68.5,34 Z" />
+    <!-- Mid Left -->
+    <path
+        android:fillColor="#F97316"
+        android:pathData="M34,48 L35.5,45.5 L37,48 L35.5,50.5 Z" />
+    <!-- Mid Right -->
+    <path
+        android:fillColor="#F97316"
+        android:pathData="M71,50 L72.5,47.5 L74,50 L72.5,52.5 Z" />
+
+    <!-- Bottom "SET!" Accent Pill -->
+    <path
+        android:fillColor="#0F172A"
+        android:pathData="M43,76 h22 c2.2,0 4,1.8 4,4 v0 c0,2.2 -1.8,4 -4,4 h-22 c-2.2,0 -4,-1.8 -4,-4 v0 c0,-2.2 1.8,-4 4,-4 Z" />
+    <path
+        android:fillColor="#F97316"
+        android:pathData="M43,76 h22 c2.2,0 4,1.8 4,4 v0 c0,2.2 -1.8,4 -4,4 h-22 c-2.2,0 -4,-1.8 -4,-4 v0 c0,-2.2 1.8,-4 4,-4 Z"
+        android:strokeColor="#F97316"
+        android:strokeWidth="0.8" />
+    <!-- 4 dots representing 4-of-a-kind (Minimalist icon representation) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M48,80 A1.5,1.5 0 1,0 48,80.01 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M52,80 A1.5,1.5 0 1,0 52,80.01 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M56,80 A1.5,1.5 0 1,0 56,80.01 Z" />
+    <path
+        android:fillColor="#F97316"
+        android:pathData="M60,80 A1.5,1.5 0 1,0 60,80.01 Z" />
 </vector>
