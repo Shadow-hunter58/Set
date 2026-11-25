@@ -25,19 +25,51 @@
       });
     }
 
+    // Comprehensive check if running as installed app (Android APK / Standalone PWA / iOS WebClip)
+    function isAppAlreadyInstalled() {
+      return window.matchMedia('(display-mode: standalone)').matches ||
+             window.navigator.standalone === true ||
+             document.referrer.includes('android-app://') ||
+             window.location.protocol === 'file:' ||
+             navigator.userAgent.includes('wv') ||
+             window.location.search.includes('source=pwa') ||
+             localStorage.getItem('set_app_installed') === 'true';
+    }
+
     let deferredInstallPrompt = null;
+
+    // Listen for install prompt from browser
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredInstallPrompt = e;
+      if (!isAppAlreadyInstalled()) {
+        const installBtn = document.getElementById('installAppBtn');
+        if (installBtn) installBtn.classList.remove('hidden');
+      }
+    });
+
+    // When app is installed, store flag and permanently hide button
+    window.addEventListener('appinstalled', () => {
+      localStorage.setItem('set_app_installed', 'true');
+      deferredInstallPrompt = null;
       const installBtn = document.getElementById('installAppBtn');
-      if (installBtn) installBtn.classList.remove('hidden');
+      if (installBtn) installBtn.classList.add('hidden');
+    });
+
+    // Check on initial load
+    document.addEventListener('DOMContentLoaded', () => {
+      const installBtn = document.getElementById('installAppBtn');
+      if (isAppAlreadyInstalled() && installBtn) {
+        installBtn.classList.add('hidden');
+      }
     });
 
     window.installPwaApp = async function() {
       if (deferredInstallPrompt) {
         deferredInstallPrompt.prompt();
         const choice = await deferredInstallPrompt.userChoice;
-        if (choice.outcome === 'accepted') {
+        if (choice && choice.outcome === 'accepted') {
+          localStorage.setItem('set_app_installed', 'true');
           const installBtn = document.getElementById('installAppBtn');
           if (installBtn) installBtn.classList.add('hidden');
         }
@@ -132,7 +164,7 @@
       <!-- Right Multi-Action Controls -->
       <div class="flex items-center space-x-1.5">
         <!-- Install App Button -->
-        <button id="installAppBtn" class="px-2.5 py-1 rounded-full bg-primary-neon text-surface-lowest text-[10px] font-black uppercase flex items-center gap-1 glow-cyan-sm active:scale-95 cursor-pointer"
+        <button id="installAppBtn" class="hidden px-2.5 py-1 rounded-full bg-primary-neon text-surface-lowest text-[10px] font-black uppercase items-center gap-1 glow-cyan-sm active:scale-95 cursor-pointer"
                 onclick="window.installPwaApp()" title="Install App on Device">
           <span class="material-symbols-outlined text-[14px]">download</span>
           <span>Install</span>
